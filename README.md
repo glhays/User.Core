@@ -13,7 +13,7 @@ User core is a Standard Compliant system that revolves around users of a system.
 ## Standard-Compliance
 This solution is built according to The Standard. The library follows engineering principles, patterns and tooling as recommended by The Standard.
 
-This software is also a community effort which involves many nights of pair-programming, test-driven development and in-depth exploration research and design discussions.
+Standard compliant software is also a community effort which involves many nights of pair-programming, test-driven development and in-depth exploration research and design discussions.
 
 ## Standard-Promise
 The most important fulfillment aspect in a Standard complaint system is aimed towards contributing to people, its evolution, and principles.
@@ -25,3 +25,13 @@ We are committed to writing ethical and responsible software, and will always st
 We believe that these beliefs will help to ensure that our software(s) are safe and secure and that it will never be used to harm or collect personal data for malicious purposes.
  
 The Standard Community as a promise to you is in upholding these values.
+
+## Get To Know The Standard
+
+The following links will direct you to the Tri-Nature of The Standard engineering principles, patterns and tooling to get you started building your own Standard Compliant systems.
+
+[The Standard Git Repository](https://github.com/hassanhabib/The-Standard)
+
+[The Standard Team Git Repository](https://github.com/hassanhabib/The-Standard-Team)
+
+[The Standard YouTube Series](https://www.youtube.com/watch?v=8PveoymxCok&list=PLan3SCnsISTQqmSTZHQbGxBmVDwQdrlub&pp=iAQB)

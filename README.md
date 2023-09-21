@@ -1,6 +1,6 @@
 # User Core
 
-![User.Core](https://raw.githubusercontent.com/glhays/User.Core/main/User.Core/Resources/Img/uc_gitlogo.png)
+![User.Core](https://raw.githubusercontent.com/glhays/User.Core/main/User.Core/Resources/img/uc_gitlogo.png)
 
 [![User.Core Build](https://github.com/glhays/User.Core/actions/workflows/dotnet.yml/badge.svg)](https://github.com/glhays/User.Core/actions/workflows/dotnet.yml)
 [![The Standard - COMPLIANT](https://img.shields.io/badge/The_Standard-COMPLIANT-2ea44f?style=default)](https://github.com/hassanhabib/The-Standard)

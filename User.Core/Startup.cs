@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using User.Core.Brokers.Storages;
 
 namespace User.Core
 {
@@ -21,10 +22,12 @@ namespace User.Core
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
-            services.AddSwaggerGen(c =>
+            services.AddDbContext<StorageBroker>();
+            services.AddTransient<IStorageBroker, StorageBroker>();
+
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "User.Core", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "User.Core", Version = "v1" });
             });
         }
 
@@ -34,17 +37,18 @@ namespace User.Core
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "User.Core v1"));
+
+                app.UseSwaggerUI(options =>
+                    {
+                        options.SwaggerEndpoint("/swagger/v1/swagger.json", "User.Core v1");
+                    });
             }
 
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

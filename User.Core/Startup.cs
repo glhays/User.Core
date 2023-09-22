@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using User.Core.Brokers.DateTimes;
+using User.Core.Brokers.Loggings;
 using User.Core.Brokers.Storages;
 
 namespace User.Core
@@ -25,7 +26,9 @@ namespace User.Core
             services.AddControllers();
             services.AddDbContext<StorageBroker>();
             services.AddTransient<IStorageBroker, StorageBroker>();
+            services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
+            
 
             services.AddSwaggerGen(options =>
             {

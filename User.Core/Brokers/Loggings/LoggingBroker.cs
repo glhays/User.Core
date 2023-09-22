@@ -1,0 +1,40 @@
+﻿// -----------------------------------------------------------
+// Copyright(c) Coalition of the Good-Hearted Engineers
+// ======= FREE TO USE FOR THE WORLD =======
+// -----------------------------------------------------------
+
+using System;
+using Microsoft.Extensions.Logging;
+
+namespace User.Core.Brokers.Loggings
+{
+    public class LoggingBroker : ILoggingBroker
+    {
+        private readonly ILogger<LoggingBroker> logger;
+
+        public LoggingBroker(ILogger<LoggingBroker> logger) =>
+            this.logger = logger;
+
+        public void LogCritical(Exception exception) =>
+            this.logger.LogCritical(
+                exception: exception,
+                message: exception.Message);
+
+        public void LogDebug(string message) =>
+            this.logger.LogDebug(message: message);
+
+        public void LogError(Exception exception) =>
+            this.logger.LogError(
+                message: exception.Message,
+                exception: exception);
+
+        public void LogInformation(string message) =>
+            this.logger.LogInformation(message: message);
+
+        public void LogTrace(string message) =>
+            this.logger.LogTrace(message: message);
+
+        public void LogWarning(string message) =>
+            this.logger.LogWarning(message: message);
+    }
+}

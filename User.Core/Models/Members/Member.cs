@@ -5,9 +5,9 @@
 
 using System;
 
-namespace User.Core.Models.Users
+namespace User.Core.Models.Members
 {
-    public class User
+    public class Member
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; }

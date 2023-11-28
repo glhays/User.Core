@@ -26,4 +26,8 @@
     <Folder Include="Resources\img\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\User.Core.Administration\User.Core.Administration.csproj" />
+  </ItemGroup>
+
 </Project>

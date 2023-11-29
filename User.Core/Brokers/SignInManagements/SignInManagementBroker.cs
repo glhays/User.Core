@@ -5,7 +5,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using User.Core.Models.Members;
+using User.Core.Models.Users;
 
 namespace User.Core.Brokers.SignInManagements
 {

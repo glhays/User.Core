@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using User.Core.Models.Members;
+using User.Core.Models.Users;
 
 namespace User.Core.Brokers.UserManagements
 {

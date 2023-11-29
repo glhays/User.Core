@@ -5,6 +5,7 @@
 
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using Moq;
 using Tynamix.ObjectFiller;
@@ -13,6 +14,7 @@ using User.Core.Brokers.Loggings;
 using User.Core.Brokers.UserManagements;
 using User.Core.Models.Users;
 using User.Core.Services.Foundations.Users;
+using Xeptions;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -34,6 +36,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 this.dateTimeBrokerMock.Object,
                 this.loggingBrokerMock.Object);
         }
+
         private static ApplicationUser CreateRandomApplicationUser() =>
             GenerateApplicationUser();
 
@@ -72,9 +75,15 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static string GetRandomString() =>
             new MnemonicString(wordCount: GetRandomNumber()).GetValue();
+        
+        private static string GetRandomPassword() =>
+            new MnemonicString(wordCount: 1, wordMinLength: 8, wordMaxLength: 20).GetValue();
 
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 10).GetValue();
+
+        private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+               actualException => actualException.SameExceptionAs(expectedException);
 
         private static Filler<ApplicationUser> CreateApplicationUserFiller(DateTimeOffset dates)
         {

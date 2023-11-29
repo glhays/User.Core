@@ -20,7 +20,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         private async Task ShouldAddApplicationUserAsync()
         {
             // given
-            ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            DateTimeOffset dateTimeOffset = randomDateTimeOffset;
+            ApplicationUser randomApplicationUser = CreateRandomApplicationUser(dateTimeOffset);
             ApplicationUser inputApplicationUser = randomApplicationUser;
             ApplicationUser storageApplicationUser = inputApplicationUser;
             ApplicationUser expectedApplicationUser = storageApplicationUser.DeepClone();

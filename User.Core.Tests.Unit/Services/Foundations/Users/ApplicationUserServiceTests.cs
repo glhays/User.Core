@@ -39,6 +39,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static ApplicationUser CreateRandomApplicationUser() =>
             GenerateApplicationUser();
+        
+        private static ApplicationUser CreateRandomApplicationUser(DateTimeOffset date) =>
+            GenerateApplicationUser(date);
 
         private static ApplicationUser GenerateApplicationUser()
         {
@@ -52,6 +55,23 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 PhoneNumber = GetRandomPhoneNumber().ToString(),
                 CreatedDate = DateTimeOffset.UtcNow,
                 UpdatedDate = DateTimeOffset.UtcNow
+            };
+
+                return applicationUser;
+        }
+        
+        private static ApplicationUser GenerateApplicationUser(DateTimeOffset dates)
+        {
+            var applicationUser = new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                Email = new EmailAddresses().GetValue(),
+                FirstName = new RealNames(NameStyle.FirstName).GetValue(),
+                LastName = new RealNames(NameStyle.LastName).GetValue(),
+                UserName = new MnemonicString(wordCount: 1, 8, 15).GetValue(),
+                PhoneNumber = GetRandomPhoneNumber().ToString(),
+                CreatedDate = dates,
+                UpdatedDate = dates
             };
 
                 return applicationUser;

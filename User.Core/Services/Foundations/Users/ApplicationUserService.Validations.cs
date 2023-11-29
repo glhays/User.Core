@@ -4,8 +4,6 @@
 // -----------------------------------------------------------
 
 using System;
-using System.Data;
-using Microsoft.Win32.SafeHandles;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -27,8 +25,13 @@ namespace User.Core.Services.Foundations.Users
                 (Rule: IsInvalid(applicationUser.Email), Parameter: nameof(ApplicationUser.Email)),
                 (Rule: IsInvalid(applicationUser.CreatedDate), Parameter: nameof(ApplicationUser.CreatedDate)),
                 (Rule: IsInvalid(applicationUser.UpdatedDate), Parameter: nameof(ApplicationUser.UpdatedDate)),
-                (Rule: IsInvalid(password), Parameter: nameof(ApplicationUser)));
+                (Rule: IsInvalid(password), Parameter: nameof(ApplicationUser)),
 
+                (Rule: IsNotSame(
+                    firstDate: applicationUser.UpdatedDate,
+                    secondDate: applicationUser.CreatedDate,
+                    secondDateName: nameof(ApplicationUser.CreatedDate)),
+                Parameter: nameof(ApplicationUser.UpdatedDate)));
         }
 
         private static void ValidateApplicationUserIsNotNull(
@@ -58,12 +61,21 @@ namespace User.Core.Services.Foundations.Users
             Message = "Date is required"
         };
 
+        private static dynamic IsNotSame(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate != secondDate,
+                Message = $"Date is not the same as {secondDateName}."
+            };
+
         private static void Validate(params (dynamic Rule, string Parameter)[]
             validations)
         {
             var invalidApplicationUser =
                 new InvalidApplicationUserException();
-        
+
             foreach ((dynamic rule, string parameter) in validations)
             {
                 if (rule.Condition)

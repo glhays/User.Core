@@ -5,9 +5,9 @@
 
 using System;
 using Microsoft.AspNetCore.Identity;
-using User.Core.Models.Users;
 
-namespace User.Core.Models.Members
+namespace User.Core.Models.Users
+
 {
     public class ApplicationUser : IdentityUser<Guid>
     {

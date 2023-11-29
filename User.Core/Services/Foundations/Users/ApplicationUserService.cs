@@ -30,7 +30,7 @@ namespace User.Core.Services.Foundations.Users
         public ValueTask<ApplicationUser> AddUserAsync(ApplicationUser user, string password) =>
         TryCatch(async () =>
         {
-            ValidateApplicationUserOnAdd(user);
+            ValidateApplicationUserOnAdd(user, password);
             await this.userManagementBroker.InsertUserAsync(user, password);
 
             return user;

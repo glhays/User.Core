@@ -25,6 +25,10 @@ namespace User.Core.Services.Foundations.Users
             {
                 throw CreateAndLogValidationException(nullApplicationUserException);
             }
+            catch (InvalidApplicationUserException invalidApplicationUserException)
+            {
+                throw CreateAndLogValidationException(invalidApplicationUserException);
+            }
         }
 
         private ApplicationUserValidationException CreateAndLogValidationException(

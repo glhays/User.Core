@@ -73,10 +73,6 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     message: "Invalid ApplicationUser, correct errors to continue.");
 
             invalidApplicationUserException.AddData(
-                key: nameof(ApplicationUser),
-                values: "Text is required");
-
-            invalidApplicationUserException.AddData(
                 key: nameof(ApplicationUser.Id),
                 values: "Id is required");
 

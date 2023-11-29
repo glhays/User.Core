@@ -20,17 +20,11 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         private async Task ShouldAddApplicationUserAsync()
         {
             // given
-            DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
-            DateTimeOffset dateTime = randomDateTime;
             ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
             ApplicationUser inputApplicationUser = randomApplicationUser;
             ApplicationUser storageApplicationUser = inputApplicationUser;
             ApplicationUser expectedApplicationUser = storageApplicationUser.DeepClone();
             string inputPassword = GetRandomString();
-
-            this.dateTimeBrokerMock.Setup(broker =>
-                broker.GetCurrentDateTimeOffset())
-                .Returns(randomDateTime);
 
             this.userManagementBrokerMock.Setup(broker =>
                 broker.InsertUserAsync(inputApplicationUser, inputPassword))
@@ -44,17 +38,13 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             // then
             actualApplicationUser.Should().BeEquivalentTo(expectedApplicationUser);
 
-            this.dateTimeBrokerMock.Verify(broker =>
-                broker.GetCurrentDateTimeOffset(),
-                Times.Once());
-
             this.userManagementBrokerMock.Verify(broker =>
                 broker.InsertUserAsync(inputApplicationUser, inputPassword),
                 Times.Once());
 
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

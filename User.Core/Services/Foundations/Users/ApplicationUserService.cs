@@ -27,9 +27,11 @@ namespace User.Core.Services.Foundations.Users
             this.loggingBroker = loggingBroker;
         }
 
-        public ValueTask<ApplicationUser> AddUserAsync(ApplicationUser user, string password)
+        public async ValueTask<ApplicationUser> AddUserAsync(ApplicationUser user, string password)
         {
-            throw new System.NotImplementedException();
+            await this.userManagementBroker.InsertUserAsync(user, password);
+
+            return user;
         }
     }
 }

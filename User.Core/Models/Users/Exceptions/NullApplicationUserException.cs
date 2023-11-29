@@ -3,6 +3,7 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using Xeptions;
 
 namespace User.Core.Models.Users.Exceptions
@@ -14,8 +15,8 @@ namespace User.Core.Models.Users.Exceptions
             message: "ApplicationUser is null, please fix and try again.")
         {}
         
-        public NullApplicationUserException(string message)
-            :base(message)
+        public NullApplicationUserException(string message, Exception innerException)
+            :base(message, innerException)
         {}
     }
 }

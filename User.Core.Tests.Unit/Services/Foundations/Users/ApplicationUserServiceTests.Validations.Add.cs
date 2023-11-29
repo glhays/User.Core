@@ -3,6 +3,7 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
@@ -20,10 +21,12 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             // given
             ApplicationUser nullApplicationUser = null;
             string somePassword = GetRandomPassword();
+            var innerException = new Exception();
 
             var nullApplicationUserException =
                 new NullApplicationUserException(
-                    message: "ApplicationUser is null, please fix and try again.");
+                    message: "ApplicationUser is null, please fix and try again.",
+                    innerException: innerException);
 
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(

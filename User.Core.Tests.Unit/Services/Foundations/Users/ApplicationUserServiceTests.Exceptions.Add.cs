@@ -183,7 +183,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         }
 
         [Fact]
-        public async Task ShouldThrowServiceExceptionOnAddIfDatabaseUpdateErrorOccursAndLogItAsync()
+        private async Task ShouldThrowServiceExceptionOnAddIfDatabaseUpdateErrorOccursAndLogItAsync()
         {
             // given
             ApplicationUser someApplicationUser = CreateRandomApplicationUser();

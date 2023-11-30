@@ -55,14 +55,32 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogDependencyException(failedApplicationUserStorageException);
             }
+            catch (Exception exception)
+            {
+                var failedApplicationUserServiceException =
+                    new FailedApplicationUserServiceException(exception);
+
+                throw CreateAndLogServiceException(failedApplicationUserServiceException);
+            }
+        }
+        private ApplicationUserValidationException CreateAndLogValidationException(
+            Xeption exception)
+        {
+            var applicationUserValidationException =
+                new ApplicationUserValidationException(exception);
+
+            this.loggingBroker.LogError(applicationUserValidationException);
+
+            return applicationUserValidationException;
         }
 
-        private ApplicationUserDependencyException CreateAndLogDependencyException(Xeption exception)
+        private ApplicationUserDependencyException CreateAndLogCriticalDependencyExcpetion(
+            Xeption exception)
         {
             var applicationUserDependencyException =
                 new ApplicationUserDependencyException(exception);
 
-            this.loggingBroker.LogError(applicationUserDependencyException);
+            this.loggingBroker.LogCritical(applicationUserDependencyException);
 
             return applicationUserDependencyException;
         }
@@ -78,26 +96,22 @@ namespace User.Core.Services.Foundations.Users
             return applicationUserDependencyValidationException;
         }
 
-        private ApplicationUserDependencyException CreateAndLogCriticalDependencyExcpetion(
-            Xeption exception)
+        private ApplicationUserDependencyException CreateAndLogDependencyException(Xeption exception)
         {
             var applicationUserDependencyException =
                 new ApplicationUserDependencyException(exception);
 
-            this.loggingBroker.LogCritical(applicationUserDependencyException);
+            this.loggingBroker.LogError(applicationUserDependencyException);
 
             return applicationUserDependencyException;
         }
 
-        private ApplicationUserValidationException CreateAndLogValidationException(
-            Xeption exception)
+        private Exception CreateAndLogServiceException(Xeption exception)
         {
-            var applicationUserValidationException =
-                new ApplicationUserValidationException(exception);
+            var applicationUserServiceException = new ApplicationUserServiceException(exception);
+            this.loggingBroker.LogError(applicationUserServiceException);
 
-            this.loggingBroker.LogError(applicationUserValidationException);
-
-            return applicationUserValidationException;
+            return applicationUserServiceException;
         }
     }
 }

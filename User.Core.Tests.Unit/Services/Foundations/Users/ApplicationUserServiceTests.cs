@@ -15,6 +15,7 @@ using User.Core.Brokers.UserManagements;
 using User.Core.Models.Users;
 using User.Core.Services.Foundations.Users;
 using Xeptions;
+using Xunit;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -101,6 +102,21 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static int GetRandomNumber() =>
             new IntRange(min: 2, max: 10).GetValue();
+
+        private static int GetRandomNegativeNumber() =>
+            -1 * new IntRange(min: 2, max: 10).GetValue();
+
+        public static TheoryData MinutesBeforeOrAfter()
+        {
+            int randomNumber = GetRandomNumber();
+            int randomNegativeNumber = GetRandomNegativeNumber();
+
+            return new TheoryData<int>
+            {
+                randomNumber,
+                randomNegativeNumber
+            };
+        }
 
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
                actualException => actualException.SameExceptionAs(expectedException);

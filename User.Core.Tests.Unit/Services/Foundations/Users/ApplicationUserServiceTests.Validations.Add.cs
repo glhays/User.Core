@@ -122,6 +122,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             actualApplicationUserValidationException.Should().BeEquivalentTo(
                 expectedApplicationUserValidationException);
 
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(), Times.Once);
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationUserValidationException))),
@@ -131,9 +134,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 broker.InsertUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
                 Times.Never());
 
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]

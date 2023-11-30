@@ -3,7 +3,9 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
+using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
@@ -38,6 +40,24 @@ namespace User.Core.Services.Foundations.Users
                 throw CreateAndLogCriticalDependencyExcpetion(
                     failedApplicationUserStorageException);
             }
+            catch (DuplicateKeyException duplicateKeyException)
+            {
+                var alreadyExistsApplicationUserException =
+                    new AlreadyExistsApplicationUserException(duplicateKeyException);
+
+                throw CreateAndLogDependencyValidationException(alreadyExistsApplicationUserException);
+            }
+        }
+
+        private ApplicationUserDependencyValidationException CreateAndLogDependencyValidationException(
+            Xeption exception)
+        {
+            var applicationUserDependencyValidationException =
+                new ApplicationUserDependencyValidationException(exception);
+            
+            this.loggingBroker.LogError(applicationUserDependencyValidationException);
+            
+            return applicationUserDependencyValidationException;
         }
 
         private ApplicationUserDependencyException CreateAndLogCriticalDependencyExcpetion(

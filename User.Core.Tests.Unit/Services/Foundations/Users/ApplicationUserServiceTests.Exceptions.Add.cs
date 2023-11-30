@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
@@ -118,6 +119,62 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 broker.InsertUserAsync(
                     It.IsAny<ApplicationUser>(), It.IsAny<string>()),
                     Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private async Task ShouldThrowDependencyExceptionOnAddIfDatabaseUpdateErrorOccursAndLogItAsync()
+        {
+            // given
+            ApplicationUser someApplicationUser =
+                CreateRandomApplicationUser();
+
+            var databaseUpdateException =
+                new DbUpdateException();
+
+            var failedApplicationUserStorageException =
+                new FailedApplicationUserStorageException(
+                    message: "Failed ApplicationUser storage error occurred, contact support.",
+                    innerException: databaseUpdateException);
+
+            var expectedApplicationDependencyException =
+                new ApplicationUserDependencyException(
+                    message: "ApplicationUser dependency error occurred, contact support.",
+                    innerException: failedApplicationUserStorageException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Throws(databaseUpdateException);
+
+            // when
+            ValueTask<ApplicationUser> addApplicationUserTask =
+                this.applicationUserService.AddUserAsync(
+                    someApplicationUser, GetRandomPassword());
+
+            ApplicationUserDependencyException actualApplicationUserDependencyException =
+               await Assert.ThrowsAsync<ApplicationUserDependencyException>(
+                   addApplicationUserTask.AsTask);
+
+            // then
+            await Assert.ThrowsAsync<ApplicationUserDependencyException>(
+               addApplicationUserTask.AsTask);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+            
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationDependencyException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.InsertUserAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>()),
+                        Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

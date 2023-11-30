@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System.Threading.Tasks;
+using EFxceptions.Models.Exceptions;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
@@ -51,7 +52,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
                     Times.Once);
-            
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogCritical(It.Is(SameExceptionAs(
                     expectedApplicationUserDependencyException))),
@@ -59,6 +60,63 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             this.userManagementBrokerMock.Verify(broker =>
                 broker.InsertUserAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()),
+                    Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private async Task ShouldThrowDependencyValidationExceptionOnAddIfApplicationUserAlreadyExistsAndLogItAsync()
+        {
+            // given
+            ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
+            ApplicationUser alreadyExistsUser = randomApplicationUser;
+            string randomMessage = GetRandomString();
+
+            var duplicateKeyException =
+                new DuplicateKeyException(randomMessage);
+
+            var alreadyExistsUserException =
+                new AlreadyExistsApplicationUserException(
+                    message: "ApplicationUser already exists with this id.",
+                    innerException: duplicateKeyException);
+
+            var expectedApplicationUserDependencyValidationException =
+                new ApplicationUserDependencyValidationException(
+                    message: "ApplicationUser dependency validation occurred, fix and try again.",
+                    innerException: alreadyExistsUserException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Throws(duplicateKeyException);
+
+            // when
+            ValueTask<ApplicationUser> addApplicationUserTask =
+                this.applicationUserService.AddUserAsync(
+                    randomApplicationUser, GetRandomPassword());
+
+            ApplicationUserDependencyValidationException actualApplicationUserDependencyValidationException =
+               await Assert.ThrowsAsync<ApplicationUserDependencyValidationException>(
+                   addApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserDependencyValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserDependencyValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserDependencyValidationException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.InsertUserAsync(
+                    It.IsAny<ApplicationUser>(), It.IsAny<string>()),
                     Times.Never);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

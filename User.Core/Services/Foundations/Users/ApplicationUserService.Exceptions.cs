@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 using Xeptions;
@@ -47,6 +48,23 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogDependencyValidationException(alreadyExistsApplicationUserException);
             }
+            catch (DbUpdateException dbUpdateException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(dbUpdateException);
+
+                throw CreateAndLogDependencyException(failedApplicationUserStorageException);
+            }
+        }
+
+        private ApplicationUserDependencyException CreateAndLogDependencyException(Xeption exception)
+        {
+            var applicationUserDependencyException =
+                new ApplicationUserDependencyException(exception);
+
+            this.loggingBroker.LogError(applicationUserDependencyException);
+
+            return applicationUserDependencyException;
         }
 
         private ApplicationUserDependencyValidationException CreateAndLogDependencyValidationException(

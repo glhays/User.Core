@@ -6,7 +6,9 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using Microsoft.Data.SqlClient;
 using Moq;
 using Tynamix.ObjectFiller;
 using User.Core.Brokers.DateTimes;
@@ -77,6 +79,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
                 return applicationUser;
         }
+
+        private static SqlException GetSqlException() =>
+            (SqlException)RuntimeHelpers.GetUninitializedObject(typeof(SqlException));            
 
         private static object GetRandomPhoneNumber()
         {

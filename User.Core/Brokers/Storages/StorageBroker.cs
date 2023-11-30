@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using EFxceptions.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using User.Core.Models.Members;
+using User.Core.Models.Users;
 using User.Core.Models.Roles;
 
 namespace User.Core.Brokers.Storages

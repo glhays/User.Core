@@ -8,14 +8,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using User.Core.Models.Members;
+using User.Core.Models.Users;
 
 namespace User.Core.Brokers.UserManagements
 {
     public class UserManagementBroker : IUserManagementBroker
     {
-        public ValueTask<IdentityResult> InsertUserAsync(ApplicationUser user, string password) =>
-            throw new NotImplementedException();
+        private readonly UserManager<ApplicationUser> userManager;
+
+        public UserManagementBroker(UserManager<ApplicationUser> userManager)
+        {
+            this.userManager = userManager;
+        }
+
+        public async ValueTask<IdentityResult> InsertUserAsync(ApplicationUser user, string password)
+        {
+            var broker = new UserManagementBroker(this.userManager);
+            return await broker.userManager.CreateAsync(user, password);
+        }
 
         public IQueryable<ApplicationUser> SelectAllUsers() => throw new NotImplementedException();
 

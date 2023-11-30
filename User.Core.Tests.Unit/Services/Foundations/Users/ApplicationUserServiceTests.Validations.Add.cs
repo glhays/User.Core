@@ -158,6 +158,10 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     message: "ApplicationUser validation errors occurred, please try again.",
                     innerException: invalidApplicationUserException);
 
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(invalidApplicationUser.CreatedDate);
+
             // when
             ValueTask<ApplicationUser> addApplicationUserTask = 
                 this.applicationUserService.AddUserAsync(
@@ -171,14 +175,18 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             actualApplicationUserValidationException.Should().BeEquivalentTo(
                 expectedApplicationUserValidationException);
 
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once());
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     actualApplicationUserValidationException))),
                     Times.Once);
             
             this.loggingBrokerMock.VerifyNoOtherCalls();
-            this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
         }
 
         [Theory]

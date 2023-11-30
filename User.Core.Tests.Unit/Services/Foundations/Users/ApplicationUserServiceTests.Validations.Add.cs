@@ -203,7 +203,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             invalidApplicationUserException.AddData(
                 key: nameof(ApplicationUser.CreatedDate),
-                values: "Date is not recent.");
+                values: "Date is not recent");
 
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(

@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Data;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -11,7 +12,7 @@ namespace User.Core.Services.Foundations.Users
 {
     public partial class ApplicationUserService
     {
-        private static void ValidateApplicationUserOnAdd(
+        private void ValidateApplicationUserOnAdd(
             ApplicationUser applicationUser, string password)
         {
             ValidateApplicationUserIsNotNull(applicationUser);
@@ -31,7 +32,27 @@ namespace User.Core.Services.Foundations.Users
                     firstDate: applicationUser.UpdatedDate,
                     secondDate: applicationUser.CreatedDate,
                     secondDateName: nameof(ApplicationUser.CreatedDate)),
-                Parameter: nameof(ApplicationUser.UpdatedDate)));
+                Parameter: nameof(ApplicationUser.UpdatedDate)),
+                
+                (Rule: IsNotRecent(applicationUser.CreatedDate),
+                    Parameter: nameof(ApplicationUser.CreatedDate)));
+        }
+
+        private dynamic IsNotRecent(DateTimeOffset date) => new
+        {
+            Condition = IsDateNotRecent(date),
+            Message = "Date is not recent"
+        };
+
+        private bool IsDateNotRecent(DateTimeOffset date)
+        {
+            DateTimeOffset currentDateTime =
+                this.dateTimeBroker.GetCurrentDateTimeOffset();
+
+            TimeSpan timeDifference = currentDateTime.Subtract(date);
+            TimeSpan oneMinute = TimeSpan.FromMinutes(1);
+
+            return timeDifference.Duration() > oneMinute;
         }
 
         private static void ValidateApplicationUserIsNotNull(

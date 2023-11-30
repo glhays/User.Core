@@ -19,7 +19,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
     public partial class ApplicationUserServiceTests
     {
         [Fact]
-        private async Task ShouldThrowCriticalDependenyExceptionOnAddIfSqlErrorOccursAndLogItAsync()
+        private async Task ShouldThrowCriticalDependencyExceptionOnAddIfSqlExceptionOccursAndLogItAsync()
         {
             // given
             ApplicationUser someApplicationUser = CreateRandomApplicationUser();
@@ -183,7 +183,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         }
 
         [Fact]
-        private async Task ShouldThrowServiceExceptionOnAddIfDatabaseUpdateErrorOccursAndLogItAsync()
+        private async Task ShouldThrowServiceExceptionOnAddIfServiceErrorOccursAndLogItAsync()
         {
             // given
             ApplicationUser someApplicationUser = CreateRandomApplicationUser();

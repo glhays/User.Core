@@ -4,8 +4,9 @@
 // -----------------------------------------------------------
 
 using System.Threading.Tasks;
-using User.Core.Models.Users.Exceptions;
+using Microsoft.Data.SqlClient;
 using User.Core.Models.Users;
+using User.Core.Models.Users.Exceptions;
 using Xeptions;
 
 namespace User.Core.Services.Foundations.Users
@@ -29,6 +30,25 @@ namespace User.Core.Services.Foundations.Users
             {
                 throw CreateAndLogValidationException(invalidApplicationUserException);
             }
+            catch (SqlException sqlException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(sqlException);
+
+                throw CreateAndLogCriticalDependencyExcpetion(
+                    failedApplicationUserStorageException);
+            }
+        }
+
+        private ApplicationUserDependencyException CreateAndLogCriticalDependencyExcpetion(
+            Xeption exception)
+        {
+            var applicationUserDependencyException =
+                new ApplicationUserDependencyException(exception);
+
+            this.loggingBroker.LogCritical(applicationUserDependencyException);
+
+            return applicationUserDependencyException;
         }
 
         private ApplicationUserValidationException CreateAndLogValidationException(

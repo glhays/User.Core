@@ -41,6 +41,10 @@ namespace User.Core.Services.Foundations.Users
                 throw CreateAndLogCriticalDependencyExcpetion(
                     failedApplicationUserStorageException);
             }
+            catch (NotFoundApplicationUserException notFoundApplicationUserException)
+            {
+                throw CreateAndLogValidationException(notFoundApplicationUserException);
+            }
             catch (DuplicateKeyException duplicateKeyException)
             {
                 var alreadyExistsApplicationUserException =

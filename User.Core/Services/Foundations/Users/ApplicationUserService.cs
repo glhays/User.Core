@@ -3,6 +3,7 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using User.Core.Brokers.DateTimes;
 using User.Core.Brokers.Loggings;
@@ -34,6 +35,20 @@ namespace User.Core.Services.Foundations.Users
             await this.userManagementBroker.InsertUserAsync(user, password);
 
             return user;
+        });
+
+        public ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId) =>
+        TryCatch(async () =>
+        {
+            ValidateApplicationUserId(applicationUserId);
+
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
+
+            ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
+
+            return maybeApplicationUser;
+
         });
     }
 }

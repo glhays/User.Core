@@ -45,6 +45,8 @@ namespace User.Core.Services.Foundations.Users
             ApplicationUser maybeApplicationUser =
                 await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
 
+            ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
+
             return maybeApplicationUser;
 
         });

@@ -73,7 +73,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(
-                    message: "User validation error occured, fix error and try again.",
+                    message: "ApplicationUser validation errors occurred, please try again.",
                     innerException: notFoundApplicationUserValidationException);
 
             this.userManagementBrokerMock.Setup(broker =>

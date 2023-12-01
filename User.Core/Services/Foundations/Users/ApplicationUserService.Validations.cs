@@ -64,6 +64,9 @@ namespace User.Core.Services.Foundations.Users
             }
         }
 
+        private static void ValidateApplicationUserId(Guid id) =>
+            Validate((Rule: IsInvalid(id), Parameter: nameof(ApplicationUser.Id)));
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,

@@ -37,12 +37,16 @@ namespace User.Core.Services.Foundations.Users
             return user;
         });
 
-        public async ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId)
+        public ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId) =>
+        TryCatch(async () =>
         {
+            ValidateApplicationUserId(applicationUserId);
+
             ApplicationUser maybeApplicationUser =
                 await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
 
             return maybeApplicationUser;
-        }
+
+        });
     }
 }

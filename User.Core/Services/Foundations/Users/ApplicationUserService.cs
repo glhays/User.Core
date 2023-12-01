@@ -3,6 +3,7 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using User.Core.Brokers.DateTimes;
 using User.Core.Brokers.Loggings;
@@ -35,5 +36,10 @@ namespace User.Core.Services.Foundations.Users
 
             return user;
         });
+
+        public ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

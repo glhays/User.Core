@@ -37,9 +37,12 @@ namespace User.Core.Services.Foundations.Users
             return user;
         });
 
-        public ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId)
+        public async ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId)
         {
-            throw new NotImplementedException();
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
+
+            return maybeApplicationUser;
         }
     }
 }

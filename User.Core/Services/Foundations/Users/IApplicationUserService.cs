@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using User.Core.Models.Users;
 
@@ -13,5 +14,6 @@ namespace User.Core.Services.Foundations.Users
     {
         ValueTask<ApplicationUser> AddUserAsync(ApplicationUser user, string password);
         ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId);
+        IQueryable<ApplicationUser> RetrieveAllUsers();
     }
 }

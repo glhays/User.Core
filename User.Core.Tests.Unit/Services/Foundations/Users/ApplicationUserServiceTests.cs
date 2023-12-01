@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -78,6 +79,31 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             };
 
                 return applicationUser;
+        }
+
+        private static IQueryable<ApplicationUser> CreateRandomApplicationUsers(
+            DateTimeOffset dates)
+        {
+            var applicationUsers = new List<ApplicationUser>();
+
+            for (int i = 0; i < GetRandomNumber(); i++)
+            {
+                var applicationUser = new ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    Email = new EmailAddresses().GetValue(),
+                    FirstName = new RealNames(NameStyle.FirstName).GetValue(),
+                    LastName = new RealNames(NameStyle.LastName).GetValue(),
+                    UserName = new MnemonicString(wordCount: 1, 8, 15).GetValue(),
+                    PhoneNumber = GetRandomPhoneNumber().ToString(),
+                    CreatedDate = dates,
+                    UpdatedDate = dates
+                };
+
+                applicationUsers.Add(applicationUser);
+            }
+
+            return applicationUsers.AsQueryable();
         }
 
         private static SqlException GetSqlException() =>

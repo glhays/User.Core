@@ -49,7 +49,6 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
-
         }
     }
 }

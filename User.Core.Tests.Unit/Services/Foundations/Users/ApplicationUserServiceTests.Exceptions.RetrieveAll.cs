@@ -3,13 +3,10 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 using Xunit;
 
@@ -60,6 +57,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -103,9 +101,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     expectedApplicationUserServiceException))),
                         Times.Once);
 
-            this.dateTimeBrokerMock.VerifyNoOtherCalls();
-            this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

@@ -85,6 +85,13 @@ namespace User.Core.Services.Foundations.Users
                 throw CreateAndLogCriticalDependencyExcpetion(
                     failedApplicationUserStorageException);
             }
+            catch (Exception exception)
+            {
+                var failedApplicationUsersServiceException =
+                    new FailedApplicationUserServiceException(exception);
+
+                throw CreateAndLogServiceException(failedApplicationUsersServiceException);
+            }
         }
 
         private ApplicationUserValidationException CreateAndLogValidationException(

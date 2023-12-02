@@ -7,6 +7,9 @@ using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
+using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 using Xunit;
 
@@ -57,6 +60,52 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private void ShouldThrowServiceExceptionOnRetrieveAllIfServicelErrorOccursAndLogItAsync()
+        {
+            // given
+            var serviceException = new Exception();
+
+            var failedApplicationUserServiceException =
+                new FailedApplicationUserServiceException(
+                    message: "ApplicationUser service failure occurred, please contact support",
+                    innerException: serviceException);
+
+            var expectedApplicationUserServiceException =
+                new ApplicationUserServiceException(
+                    message: "ApplicationUser service error occurred, contact support.",
+                    innerException: failedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectAllUsers())
+                    .Throws(serviceException);
+
+            // when
+            Action retrieveAllApplicationUsersAction = () =>
+                this.applicationUserService.RetrieveAllUsers();
+
+            ApplicationUserServiceException actualApplicationUserServiceException =
+                Assert.Throws<ApplicationUserServiceException>(
+                    retrieveAllApplicationUsersAction);
+
+            // then
+            actualApplicationUserServiceException.Should()
+                .BeEquivalentTo(expectedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectAllUsers(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserServiceException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

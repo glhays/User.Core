@@ -53,6 +53,6 @@ namespace User.Core.Services.Foundations.Users
         });
 
         public IQueryable<ApplicationUser> RetrieveAllUsers() =>
-            this.userManagementBroker.SelectAllUsers();
+        TryCatch(() =>  this.userManagementBroker.SelectAllUsers());
     }
 }

@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
@@ -17,6 +18,7 @@ namespace User.Core.Services.Foundations.Users
     public partial class ApplicationUserService
     {
         private delegate ValueTask<ApplicationUser> ReturningApplicationUserFunction();
+        private delegate IQueryable<ApplicationUser> ReturningApplicationUsersFunction();
 
         private async ValueTask<ApplicationUser> TryCatch(
             ReturningApplicationUserFunction returningApplicationUserFunction)
@@ -67,6 +69,24 @@ namespace User.Core.Services.Foundations.Users
                 throw CreateAndLogServiceException(failedApplicationUserServiceException);
             }
         }
+
+        private IQueryable<ApplicationUser> TryCatch(
+            ReturningApplicationUsersFunction returningApplicationUsersFunction)
+        {
+            try
+            {
+                return returningApplicationUsersFunction();
+            }
+            catch (SqlException sqlException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(sqlException);
+
+                throw CreateAndLogCriticalDependencyExcpetion(
+                    failedApplicationUserStorageException);
+            }
+        }
+
         private ApplicationUserValidationException CreateAndLogValidationException(
             Xeption exception)
         {

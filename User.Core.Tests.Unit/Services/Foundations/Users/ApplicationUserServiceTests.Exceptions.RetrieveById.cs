@@ -38,15 +38,18 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 .ThrowsAsync(sqlException);
 
             // when
-            ValueTask<ApplicationUser> retrieveUserTask =
-                this.applicationUserService.RetrieveUserByIdAsync(
-                    someApplicationUserId);
+            ValueTask<ApplicationUser> retrieveApplicationUserByIdTask =
+               this.applicationUserService.RetrieveUserByIdAsync(
+                   someApplicationUserId);
 
-            ApplicationUserDependencyException actualUserDependencyException =
+            ApplicationUserDependencyException actualApplicationUserDependencyException =
                 await Assert.ThrowsAsync<ApplicationUserDependencyException>(
-                    retrieveUserTask.AsTask);
+                    retrieveApplicationUserByIdTask.AsTask);
 
             // then
+            actualApplicationUserDependencyException.Should().BeEquivalentTo(
+                expectedApplicationUserDependencyException);
+
             this.userManagementBrokerMock.Verify(broker =>
                 broker.SelectUserByIdAsync(It.IsAny<Guid>()),
                     Times.Once());

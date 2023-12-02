@@ -47,6 +47,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         private static ApplicationUser CreateRandomApplicationUser(DateTimeOffset date) =>
             GenerateApplicationUser(date);
 
+        private static ApplicationUser CreateRandomModifyApplicationUser(DateTimeOffset date) =>
+            GenerateRandomModifyApplicationUser(date);
+
         private static ApplicationUser GenerateApplicationUser()
         {
             var applicationUser = new ApplicationUser
@@ -104,6 +107,23 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             }
 
             return applicationUsers.AsQueryable();
+        }
+
+        private static ApplicationUser GenerateRandomModifyApplicationUser(DateTimeOffset dates)
+        {
+            var randomModifyApplicationUser = new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                Email = new EmailAddresses().GetValue(),
+                FirstName = new RealNames(NameStyle.FirstName).GetValue(),
+                LastName = new RealNames(NameStyle.LastName).GetValue(),
+                UserName = new MnemonicString(wordCount: 1, 8, 15).GetValue(),
+                PhoneNumber = GetRandomPhoneNumber().ToString(),
+                CreatedDate = dates,
+                UpdatedDate = dates
+            };
+
+            return randomModifyApplicationUser;
         }
 
         private static SqlException GetSqlException() =>

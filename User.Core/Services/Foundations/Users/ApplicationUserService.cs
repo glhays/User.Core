@@ -54,5 +54,8 @@ namespace User.Core.Services.Foundations.Users
 
         public IQueryable<ApplicationUser> RetrieveAllUsers() =>
         TryCatch(() =>  this.userManagementBroker.SelectAllUsers());
+
+        public ValueTask<ApplicationUser> ModifyUserAsync(ApplicationUser user) =>
+            throw new NotImplementedException();
     }
 }

@@ -3,6 +3,7 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
 using System;
@@ -58,6 +59,54 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
                     Times.Never);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private async Task ShouldThrowServiceExceptionOnRetrieveByIdIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            Guid someApplicationUserId = Guid.NewGuid();
+            var serviceException = new Exception();
+
+            var failedApplicationUserServiceException =
+                new FailedApplicationUserServiceException(
+                    message: "ApplicationUser service failure occurred, please contact support",
+                    innerException: serviceException);
+
+            var expectedApplicationUserServiceException =
+                new ApplicationUserServiceException(
+                    message: "ApplicationUser service error occurred, contact support.",
+                    innerException: failedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(It.IsAny<Guid>()))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<ApplicationUser> retrieveApplicationUserByIdTask =
+                this.applicationUserService.RetrieveUserByIdAsync(
+                    someApplicationUserId);
+
+            ApplicationUserServiceException actualApplicationUserServiceException =
+                await Assert.ThrowsAsync<ApplicationUserServiceException>(
+                    retrieveApplicationUserByIdTask.AsTask);
+
+            // then
+            actualApplicationUserServiceException.Should().BeEquivalentTo(
+                expectedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(It.IsAny<Guid>()),
+                    Times.Once());
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserServiceException))),
+                        Times.Once());
 
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

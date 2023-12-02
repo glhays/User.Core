@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using User.Core.Brokers.DateTimes;
 using User.Core.Brokers.Loggings;
@@ -50,5 +51,8 @@ namespace User.Core.Services.Foundations.Users
             return maybeApplicationUser;
 
         });
+
+        public IQueryable<ApplicationUser> RetrieveAllUsers() =>
+        TryCatch(() =>  this.userManagementBroker.SelectAllUsers());
     }
 }

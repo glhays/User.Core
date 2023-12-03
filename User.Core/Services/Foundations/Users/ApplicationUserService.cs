@@ -56,6 +56,17 @@ namespace User.Core.Services.Foundations.Users
         TryCatch(() =>  this.userManagementBroker.SelectAllUsers());
 
         public ValueTask<ApplicationUser> ModifyUserAsync(ApplicationUser user) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            ValidateApplicationUserOnModify(user);
+
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(user.Id);
+
+            ValidateStorageApplicationUser(maybeApplicationUser, user.Id);
+
+            return await this.userManagementBroker.UpdateUserAsync(user);
+
+        });
     }
 }

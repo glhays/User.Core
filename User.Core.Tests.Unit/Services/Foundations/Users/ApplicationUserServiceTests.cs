@@ -111,6 +111,8 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static ApplicationUser GenerateRandomModifyApplicationUser(DateTimeOffset dates)
         {
+            var randomDaysInPast = GetRandomNegativeNumber();
+
             var randomModifyApplicationUser = new ApplicationUser
             {
                 Id = Guid.NewGuid(),
@@ -122,6 +124,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 CreatedDate = dates,
                 UpdatedDate = dates
             };
+
+            randomModifyApplicationUser.CreatedDate =
+                randomModifyApplicationUser.CreatedDate.AddDays(randomDaysInPast);
 
             return randomModifyApplicationUser;
         }

@@ -23,16 +23,21 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 GetRandomDateTimeOffset();
 
             ApplicationUser randomApplicationUser =
-                CreateRandomModifyApplicationUser(randomDateTimeOffset);
+                CreateRandomModifyApplicationUser(
+                    randomDateTimeOffset);
 
-            ApplicationUser inputApplicationUser = randomApplicationUser;
-            ApplicationUser updatedStorageApplicationUser = inputApplicationUser;
-            ApplicationUser expectedApplicationUser = updatedStorageApplicationUser;
+            ApplicationUser inputApplicationUser =
+                randomApplicationUser;
 
-            ApplicationUser beforeUpdatedStorageApplicationUser =
-                randomApplicationUser.DeepClone();
+            ApplicationUser storageApplicationUser =
+                inputApplicationUser;
 
-            inputApplicationUser.UpdatedDate = randomDateTimeOffset;
+            ApplicationUser updatedApplicationUser =
+                inputApplicationUser;
+
+            ApplicationUser expectedApplicationUser =
+                updatedApplicationUser.DeepClone();
+
             Guid userId = inputApplicationUser.Id;
 
             this.dateTimeBrokerMock.Setup(broker =>
@@ -41,19 +46,20 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             this.userManagementBrokerMock.Setup(broker =>
                 broker.SelectUserByIdAsync(userId))
-                    .ReturnsAsync(beforeUpdatedStorageApplicationUser);
+                    .ReturnsAsync(storageApplicationUser);
 
             this.userManagementBrokerMock.Setup(broker =>
                 broker.UpdateUserAsync(inputApplicationUser))
-                    .ReturnsAsync(updatedStorageApplicationUser);
+                    .ReturnsAsync(updatedApplicationUser);
 
             // when
-            ApplicationUser actualUser =
+            ApplicationUser actualApplicationUser =
                 await this.applicationUserService.ModifyUserAsync(
                     inputApplicationUser);
 
             // then
-            actualUser.Should().BeEquivalentTo(expectedApplicationUser);
+            actualApplicationUser.Should().BeEquivalentTo(
+                expectedApplicationUser);
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),

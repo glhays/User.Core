@@ -39,8 +39,7 @@ namespace User.Core.Services.Foundations.Users
 
         private void ValidateApplicationUserOnModify(ApplicationUser applicationUser)
         {
-            // This was added prematurely!!! Excluded here in brevity to honor the Fail/Pass sequence on commit
-            //ValidateApplicationUserIsNotNull(applicationUser);
+            ValidateApplicationUserIsNotNull(applicationUser);
 
             Validate(
                 (Rule: IsInvalid(applicationUser.FirstName), Parameter: nameof(ApplicationUser.FirstName)),

@@ -174,6 +174,18 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             };
         }
 
+        public static IEnumerable<object[]> InvalidMinuteCases()
+        {
+            int randomMoreThanMinuteFromNow = GetRandomNumber();
+            int randomMoreThanMinuteBeforeNow = GetRandomNegativeNumber();
+
+            return new List<object[]>
+            {
+                new object[] { randomMoreThanMinuteFromNow },
+                new object[] { randomMoreThanMinuteBeforeNow}
+            };
+        }
+
         private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
                actualException => actualException.SameExceptionAs(expectedException);
 

@@ -196,5 +196,65 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Theory]
+        [MemberData(nameof(InvalidMinuteCases))]
+        private async Task ShouldThrowValidationExceptionOnModifyIfUpdatedDateIsNotRecentAndLogItAsync(int minutes)
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset);
+            
+            randomApplicationUser.UpdatedDate = randomDateTimeOffset.AddMinutes(minutes);
+
+            var invalidApplicationUserException =
+                new InvalidApplicationUserException(
+                    message: "Invalid ApplicationUser, correct errors to continue.");
+
+            invalidApplicationUserException.AddData(
+                key: nameof(ApplicationUser.UpdatedDate),
+                values: $"Date is not recent");
+
+            var expectedApplicationUserValidationException =
+                new ApplicationUserValidationException(
+                    message: "ApplicationUser validation errors occurred, please try again.",
+                    innerException: invalidApplicationUserException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(randomApplicationUser);
+
+            ApplicationUserValidationException actualApplicationUserValidationException =
+               await Assert.ThrowsAsync<ApplicationUserValidationException>(
+                   modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserValidationException);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserValidationException))),
+                    Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(It.IsAny<Guid>()),
+                Times.Never);
+
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+
+        }
     }
 }

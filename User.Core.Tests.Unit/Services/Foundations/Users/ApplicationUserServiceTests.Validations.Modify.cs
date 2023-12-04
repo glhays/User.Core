@@ -27,7 +27,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     message: "ApplicationUser is null, please fix and try again.",
                     innerException: innerException);
 
-            var expectApplicationUserValidationException =
+            var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(
                     message: "ApplicationUser validation errors occurred, please try again.",
                     innerException: nullApplicationUserException);
@@ -42,11 +42,11 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             // then
             actualApplicationUserValidationException.Should().BeEquivalentTo(
-                expectApplicationUserValidationException);
+                expectedApplicationUserValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
-                    expectApplicationUserValidationException))),
+                    expectedApplicationUserValidationException))),
                     Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>

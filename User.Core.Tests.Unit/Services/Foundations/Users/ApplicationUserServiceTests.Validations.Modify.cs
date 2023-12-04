@@ -9,6 +9,7 @@ using FluentAssertions;
 using Moq;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
+using Xeptions;
 using Xunit;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
@@ -254,7 +255,73 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
+        }
 
+        [Fact]
+        private async Task ShouldThrowValidationExceptionOnModifyIfApplicationUserDoesNotExistAndLogItAsync()
+        {
+            // given
+            int randomNegativeMinutes = GetRandomNegativeNumber();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset);
+            
+            ApplicationUser nonExistentApplicationUser = randomApplicationUser;
+
+            nonExistentApplicationUser.CreatedDate =
+                randomDateTimeOffset.AddMinutes(randomNegativeMinutes);
+            
+            ApplicationUser nullApplicationUser = null;
+            var innerException = new Exception();
+
+            var notFoundApplicationUserException =
+                new NotFoundApplicationUserException(
+                    message: $"ApplicationUser not found with id: {nonExistentApplicationUser.Id}.",
+                    innerException: innerException.As<Xeption>());
+
+            var expectedApplicationUserValidationException =
+                new ApplicationUserValidationException(
+                    message: "ApplicationUser validation errors occurred, please try again.",
+                    innerException: notFoundApplicationUserException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(nonExistentApplicationUser.Id))
+                .ReturnsAsync(nullApplicationUser);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(
+                    nonExistentApplicationUser);
+
+            ApplicationUserValidationException actualApplicationUserValidationException =
+               await Assert.ThrowsAsync<ApplicationUserValidationException>(
+                   modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserValidationException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(nonExistentApplicationUser.Id),
+                Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserValidationException))),
+                    Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

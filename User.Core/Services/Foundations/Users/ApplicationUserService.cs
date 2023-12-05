@@ -72,5 +72,8 @@ namespace User.Core.Services.Foundations.Users
             return await this.userManagementBroker.UpdateUserAsync(user);
 
         });
+
+        public ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId) =>
+            throw new NotImplementedException();
     }
 }

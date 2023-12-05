@@ -203,5 +203,68 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowServiceExceptionOnModifyIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            int minutesInPast = GetRandomNegativeNumber();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset);
+
+            randomApplicationUser.CreatedDate =
+                randomDateTimeOffset.AddMinutes(minutesInPast);
+
+            var serviceException = new Exception();
+
+            var failedApplicationUserException =
+                new FailedApplicationUserServiceException(
+                    message: "ApplicationUser service failure occurred, please contact support",
+                    innerException: serviceException);
+
+            var expectedApplicationUserServiceException =
+                new ApplicationUserServiceException(
+                    message: "ApplicationUser service error occurred, contact support.",
+                    innerException: failedApplicationUserException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id))
+                    .ThrowsAsync(serviceException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(randomApplicationUser);
+
+            ApplicationUserServiceException actualApplicationUserServiceException =
+                await Assert.ThrowsAsync<ApplicationUserServiceException>(
+                    modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserServiceException.Should().BeEquivalentTo(
+                expectedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id),
+                    Times.Once());
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserServiceException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

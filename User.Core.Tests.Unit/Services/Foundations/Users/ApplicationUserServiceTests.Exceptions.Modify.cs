@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
@@ -73,6 +74,70 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private async Task ShouldThrowDependencyExceptionOnModifyIfDatabaseUpdateExceptionOccursAndLogItAsync()
+        {
+            // given
+            int minutesInPast = GetRandomNegativeNumber();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset); 
+
+            randomApplicationUser.CreatedDate =
+                randomDateTimeOffset.AddMinutes(minutesInPast);
+
+            var dbUpdateException = new DbUpdateException();
+
+            var failedApplicationUserException =
+                new FailedApplicationUserStorageException(
+                    message: "Failed ApplicationUser storage error occurred, contact support.",
+                    innerException: dbUpdateException);
+
+            var expectedApplicationUserDependencyException =
+                new ApplicationUserDependencyException(
+                    message: "ApplicationUser dependency error occurred, contact support.",
+                    innerException: failedApplicationUserException);
+
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id))
+                    .ThrowsAsync(dbUpdateException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(randomApplicationUser);
+
+            ApplicationUserDependencyException actualApplicationUserDependencyException =
+                await Assert.ThrowsAsync<ApplicationUserDependencyException>(
+                    modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserDependencyException.Should().BeEquivalentTo(
+                expectedApplicationUserDependencyException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id),
+                    Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserDependencyException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
         }
     }
 }

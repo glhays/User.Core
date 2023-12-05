@@ -139,5 +139,69 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowDependencyValidationExceptionOnModifyIfDbConcurrencyOccursAndLogItAsync()
+        {
+            // given
+            int minutesInPast = GetRandomNegativeNumber();
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset);
+
+            randomApplicationUser.CreatedDate =
+                randomDateTimeOffset.AddMinutes(minutesInPast);
+
+            var dbUpdateConcurrencyException =
+                new DbUpdateConcurrencyException();
+
+            var lockedApplicationUserException =
+                new LockedApplicationUserException(
+                    message: "ApplicationUser is currently locked, please try again.",
+                    innerException: dbUpdateConcurrencyException);
+
+            var expectedUserDependencyValidationException =
+                new ApplicationUserDependencyValidationException(
+                    message: "ApplicationUser dependency validation occurred, fix and try again.",
+                    innerException: lockedApplicationUserException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id))
+                    .ThrowsAsync(dbUpdateConcurrencyException);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                    .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(randomApplicationUser);
+
+            ApplicationUserDependencyValidationException actualApplicationUserDependencyValidationException =
+                await Assert.ThrowsAsync<ApplicationUserDependencyValidationException>(
+                    modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserDependencyValidationException.Should().BeEquivalentTo(
+                expectedUserDependencyValidationException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id),
+                    Times.Once());
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedUserDependencyValidationException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

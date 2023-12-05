@@ -109,7 +109,7 @@ namespace User.Core.Services.Foundations.Users
                     secondDateName: nameof(ApplicationUser.CreatedDate)),
                 Parameter: nameof(ApplicationUser.CreatedDate)),
 
-                (Rule: IsNotSame(
+                (Rule: IsSame(
                     firstDate: inputApplicationUser.UpdatedDate,
                     secondDate: storageApplicationUser.UpdatedDate,
                     secondDateName: nameof(ApplicationUser.UpdatedDate)),
@@ -140,7 +140,7 @@ namespace User.Core.Services.Foundations.Users
             string secondDateName) => new
             {
                 Condition = firstDate != secondDate,
-                Message = $"Date is not the same as {secondDateName}."
+                Message = $"Date is not the same as {secondDateName}"
             };
 
         private static dynamic IsSame(
@@ -149,7 +149,7 @@ namespace User.Core.Services.Foundations.Users
             string secondDateName) => new
             {
                 Condition = firstDate == secondDate,
-                Message = $"Date is the same as {secondDateName}"
+                Message = $"Date is the same as {secondDateName}."
             };
 
         private static void Validate(params (dynamic Rule, string Parameter)[]

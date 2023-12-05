@@ -395,5 +395,70 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowValidationExceptionOnModifyIfStorageUpdatedDateIsSameAsUpdatedDateAndLogItAsync()
+        {
+            // given
+            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomModifyApplicationUser(randomDateTimeOffset);
+            
+            ApplicationUser invalidApplicationUser = randomApplicationUser;
+            ApplicationUser storageApplicationUser = randomApplicationUser.DeepClone();
+            invalidApplicationUser.UpdatedDate = storageApplicationUser.UpdatedDate;
+
+            var invalidApplicationUserException =
+                new InvalidApplicationUserException(
+                    message: "Invalid ApplicationUser, correct errors to continue.");
+
+            invalidApplicationUserException.AddData(
+                key: nameof(ApplicationUser.UpdatedDate),
+                values: $"Date is the same as {nameof(ApplicationUser.UpdatedDate)}.");
+
+            var expectedApplicationUserValidationException =
+                new ApplicationUserValidationException(
+                    message: "ApplicationUser validation errors occurred, please try again.",
+                    innerException: invalidApplicationUserException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(invalidApplicationUser.Id))
+                .ReturnsAsync(storageApplicationUser);
+
+            this.dateTimeBrokerMock.Setup(broker =>
+                broker.GetCurrentDateTimeOffset())
+                .Returns(randomDateTimeOffset);
+
+            // when
+            ValueTask<ApplicationUser> modifyApplicationUserTask =
+                this.applicationUserService.ModifyUserAsync(
+                    invalidApplicationUser);
+
+            ApplicationUserValidationException actualApplicationUserValidationException =
+               await Assert.ThrowsAsync<ApplicationUserValidationException>(
+                   modifyApplicationUserTask.AsTask);
+
+            // then
+            actualApplicationUserValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserValidationException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(invalidApplicationUser.Id),
+                Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserValidationException))),
+                    Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

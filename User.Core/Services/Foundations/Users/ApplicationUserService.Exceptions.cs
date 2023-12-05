@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
@@ -53,6 +54,13 @@ namespace User.Core.Services.Foundations.Users
                     new AlreadyExistsApplicationUserException(duplicateKeyException);
 
                 throw CreateAndLogDependencyValidationException(alreadyExistsApplicationUserException);
+            }
+            catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                var lockedApplicationUserException =
+                    new LockedApplicationUserException(dbUpdateConcurrencyException);
+
+                throw CreateAndLogDependencyValidationException(lockedApplicationUserException);
             }
             catch (DbUpdateException dbUpdateException)
             {

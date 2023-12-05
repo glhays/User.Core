@@ -332,12 +332,17 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             int randomNumber = GetRandomNumber();
             int randomMinutes = randomNumber;
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
-            ApplicationUser randomApplicationUser = CreateRandomApplicationUser(randomDateTimeOffset);
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser(randomDateTimeOffset);
+
             ApplicationUser invalidApplicationUser = randomApplicationUser;
             invalidApplicationUser.UpdatedDate = randomDateTimeOffset;
             ApplicationUser storageApplicationUser = randomApplicationUser.DeepClone();
             Guid applicationUserId = invalidApplicationUser.Id;
-            invalidApplicationUser.CreatedDate = storageApplicationUser.CreatedDate.AddMinutes(randomMinutes);
+            
+            invalidApplicationUser.CreatedDate =
+                storageApplicationUser.CreatedDate.AddMinutes(randomMinutes);
 
             var invalidApplicationUserException =
                 new InvalidApplicationUserException(
@@ -345,7 +350,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             invalidApplicationUserException.AddData(
                 key: nameof(ApplicationUser.CreatedDate),
-                values: $"Date is not the same as {nameof(ApplicationUser.CreatedDate)}");
+                values: $"Date is not the same as {nameof(ApplicationUser.CreatedDate)}.");
 
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(

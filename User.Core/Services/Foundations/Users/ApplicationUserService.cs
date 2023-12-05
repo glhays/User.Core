@@ -65,6 +65,10 @@ namespace User.Core.Services.Foundations.Users
 
             ValidateStorageApplicationUser(maybeApplicationUser, user.Id);
 
+            ValidateAgainstStorageApplicationUserOnModify(
+                inputApplicationUser: user,
+                storageApplicationUser: maybeApplicationUser);
+
             return await this.userManagementBroker.UpdateUserAsync(user);
 
         });

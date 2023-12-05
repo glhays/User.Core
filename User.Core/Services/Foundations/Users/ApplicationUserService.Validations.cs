@@ -98,6 +98,24 @@ namespace User.Core.Services.Foundations.Users
             }
         }
 
+        private static void ValidateAgainstStorageApplicationUserOnModify(
+            ApplicationUser inputApplicationUser,
+            ApplicationUser storageApplicationUser)
+        {
+            Validate(
+                (Rule: IsNotSame(
+                    firstDate: inputApplicationUser.CreatedDate,
+                    secondDate: storageApplicationUser.CreatedDate,
+                    secondDateName: nameof(ApplicationUser.CreatedDate)),
+                Parameter: nameof(ApplicationUser.CreatedDate)),
+
+                (Rule: IsNotSame(
+                    firstDate: inputApplicationUser.UpdatedDate,
+                    secondDate: storageApplicationUser.UpdatedDate,
+                    secondDateName: nameof(ApplicationUser.UpdatedDate)),
+                Parameter: nameof(ApplicationUser.UpdatedDate)));
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,

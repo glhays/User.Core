@@ -19,18 +19,22 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         private async Task ShouldModifyApplicationUserAsync()
         {
             // given
+            int minuteInPast = GetRandomNegativeNumber();
+            
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
             ApplicationUser randomApplicationUser =
                 CreateRandomModifyApplicationUser(
-                    randomDateTimeOffset);
+                    randomDateTimeOffset.AddMinutes(minuteInPast));
 
             ApplicationUser inputApplicationUser =
-                randomApplicationUser;
+                randomApplicationUser.DeepClone();
+
+            inputApplicationUser.UpdatedDate = randomDateTimeOffset;
 
             ApplicationUser storageApplicationUser =
-                inputApplicationUser;
+                randomApplicationUser;
 
             ApplicationUser updatedApplicationUser =
                 inputApplicationUser;
@@ -45,7 +49,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     .Returns(randomDateTimeOffset);
 
             this.userManagementBrokerMock.Setup(broker =>
-                broker.SelectUserByIdAsync(userId))
+                broker.SelectUserByIdAsync(inputApplicationUser.Id))
                     .ReturnsAsync(storageApplicationUser);
 
             this.userManagementBrokerMock.Setup(broker =>
@@ -66,7 +70,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>
-                broker.SelectUserByIdAsync(userId),
+                broker.SelectUserByIdAsync(inputApplicationUser.Id),
                 Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>

@@ -107,7 +107,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 values: new[]
                 {
                     "Date is required",
-                    $"Date is the same as {nameof(ApplicationUser.CreatedDate)}"
+                    $"Date is the same as {nameof(ApplicationUser.CreatedDate)}."
                 });
 
             var expectedApplicationUserValidationException =
@@ -158,7 +158,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             invalidApplicationUserException.AddData(
                 key: nameof(ApplicationUser.UpdatedDate),
-                values: $"Date is the same as {nameof(ApplicationUser.CreatedDate)}");
+                values: $"Date is the same as {nameof(ApplicationUser.CreatedDate)}.");
 
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(
@@ -336,9 +336,15 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser(randomDateTimeOffset);
 
-            ApplicationUser invalidApplicationUser = randomApplicationUser;
-            invalidApplicationUser.UpdatedDate = randomDateTimeOffset;
+            ApplicationUser invalidApplicationUser = randomApplicationUser.DeepClone();
             ApplicationUser storageApplicationUser = randomApplicationUser.DeepClone();
+            
+            storageApplicationUser.CreatedDate =
+                storageApplicationUser.CreatedDate.AddMinutes(randomMinutes);
+            
+            storageApplicationUser.UpdatedDate =
+                storageApplicationUser.UpdatedDate.AddMinutes(randomMinutes);
+            
             Guid applicationUserId = invalidApplicationUser.Id;
             
             invalidApplicationUser.CreatedDate =

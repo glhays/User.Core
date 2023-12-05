@@ -140,7 +140,7 @@ namespace User.Core.Services.Foundations.Users
             string secondDateName) => new
             {
                 Condition = firstDate != secondDate,
-                Message = $"Date is not the same as {secondDateName}"
+                Message = $"Date is not the same as {secondDateName}."
             };
 
         private static dynamic IsSame(

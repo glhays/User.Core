@@ -74,6 +74,17 @@ namespace User.Core.Services.Foundations.Users
         });
 
         public ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId) =>
-            throw new NotImplementedException();
+        TryCatch(async () =>
+        {
+            ValidateApplicationUserId(applicationUserId);
+
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
+
+            ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
+
+            return await this.userManagementBroker.DeleteUserAsync(maybeApplicationUser);
+        
+        });
     }
 }

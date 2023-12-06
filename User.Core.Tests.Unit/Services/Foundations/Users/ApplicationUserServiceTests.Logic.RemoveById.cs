@@ -40,13 +40,13 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 .ReturnsAsync(storageApplicationUser);
 
             this.userManagementBrokerMock.Setup(broker =>
-                broker.DeleteUserAsync(expectedApplicationUser))
+                broker.DeleteUserAsync(inputApplicationUser))
                 .ReturnsAsync(removedApplicationUser);
 
             // when
             ApplicationUser actualApplicationUser =
                 await this.applicationUserService
-                .RemoveUserByIdAsync(inputApplicationUser.Id);
+                .RemoveUserByIdAsync(someId);
 
             // then
             actualApplicationUser.Should().BeEquivalentTo(
@@ -57,7 +57,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 Times.Once());
         
             this.userManagementBrokerMock.Verify(broker =>
-                broker.DeleteUserAsync(expectedApplicationUser),
+                broker.DeleteUserAsync(inputApplicationUser),
                 Times.Once());
         
             this.userManagementBrokerMock.VerifyNoOtherCalls();

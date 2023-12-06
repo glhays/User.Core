@@ -116,5 +116,53 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowServiceExceptionOnRemoveByIdIfServiceErrorOccursAndLogItAsync()
+        {
+            // given
+            ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
+
+            var serviceException = new Exception();
+
+            var failedApplicationUserException =
+                new FailedApplicationUserServiceException(
+                    message: "ApplicationUser service failure occurred, please contact support",
+                    innerException: serviceException);
+
+            var expectedApplicationUserServiceException =
+                new ApplicationUserServiceException(
+                    message: "ApplicationUser service error occurred, contact support.",
+                    innerException: failedApplicationUserException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id))
+                    .ThrowsAsync(serviceException);
+
+            // when
+            ValueTask<ApplicationUser> removeApplicationUserByIdTask =
+                this.applicationUserService.RemoveUserByIdAsync(randomApplicationUser.Id);
+
+            ApplicationUserServiceException actualApplicationUserServiceException =
+                await Assert.ThrowsAsync<ApplicationUserServiceException>(
+                    removeApplicationUserByIdTask.AsTask);
+
+            // then
+            actualApplicationUserServiceException.Should().BeEquivalentTo(
+                expectedApplicationUserServiceException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(randomApplicationUser.Id),
+                    Times.Once());
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserServiceException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

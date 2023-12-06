@@ -11,6 +11,7 @@ using User.Core.Models.Users.Exceptions;
 using User.Core.Models.Users;
 using Xunit;
 using FluentAssertions;
+using Microsoft.Data.SqlClient;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -59,6 +60,57 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationUserDependencyValidationException))),
                         Times.Once);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        private async Task ShouldThrowCriticalDependencyExceptionOnRemoveByIdIfSqlErrorOccursAndLogItAsync()
+        {
+            // given
+            Guid someGuid = Guid.NewGuid();
+            SqlException sqlException = GetSqlException();
+
+            var failedApplicationUserStorageException =
+                new FailedApplicationUserStorageException(
+                    message: "Failed ApplicationUser storage error occurred, contact support.",
+                    innerException: sqlException);
+
+            var expectedApplicationUserDependencyException =
+                new ApplicationUserDependencyException(
+                    message: "ApplicationUser dependency error occurred, contact support.",
+                    innerException: failedApplicationUserStorageException);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.SelectUserByIdAsync(someGuid))
+                    .Throws(sqlException);
+
+            // when
+            ValueTask<ApplicationUser> removeApplicationUserByIdTask =
+                this.applicationUserService.RemoveUserByIdAsync(someGuid);
+
+            ApplicationUserDependencyException actualApplicationUserDependencyException =
+                await Assert.ThrowsAsync<ApplicationUserDependencyException>(() =>
+                    removeApplicationUserByIdTask.AsTask());
+
+            // then
+            actualApplicationUserDependencyException.Should().BeEquivalentTo(
+                expectedApplicationUserDependencyException);
+            
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectUserByIdAsync(It.IsAny<Guid>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogCritical(It.Is(SameExceptionAs(
+                    expectedApplicationUserDependencyException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Never);
 
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

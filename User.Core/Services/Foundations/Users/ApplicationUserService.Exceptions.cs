@@ -4,7 +4,6 @@
 // -----------------------------------------------------------
 
 using System;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using EFxceptions.Models.Exceptions;
@@ -129,9 +128,9 @@ namespace User.Core.Services.Foundations.Users
         {
             var applicationUserDependencyValidationException =
                 new ApplicationUserDependencyValidationException(exception);
-            
+
             this.loggingBroker.LogError(applicationUserDependencyValidationException);
-            
+
             return applicationUserDependencyValidationException;
         }
 

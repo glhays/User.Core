@@ -55,11 +55,11 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.userManagementBrokerMock.Verify(broker =>
                 broker.SelectUserByIdAsync(someId),
                 Times.Once());
-        
+
             this.userManagementBrokerMock.Verify(broker =>
                 broker.DeleteUserAsync(inputApplicationUser),
                 Times.Once());
-        
+
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();

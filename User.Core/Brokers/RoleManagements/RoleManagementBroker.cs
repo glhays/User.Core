@@ -16,12 +16,12 @@ namespace User.Core.Brokers.RoleManagements
         {
             throw new NotImplementedException();
         }
-     
+
         public IQueryable<ApplicationRole> SelectAllRoles()
         {
             throw new NotImplementedException();
         }
-        
+
         public ValueTask<ApplicationRole> SelectRoleByIdAsync(Guid userId)
         {
             throw new NotImplementedException();

@@ -43,7 +43,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static ApplicationUser CreateRandomApplicationUser() =>
             GenerateApplicationUser();
-        
+
         private static ApplicationUser CreateRandomApplicationUser(DateTimeOffset date) =>
             GenerateApplicationUser(date);
 
@@ -64,9 +64,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 UpdatedDate = DateTimeOffset.UtcNow
             };
 
-                return applicationUser;
+            return applicationUser;
         }
-        
+
         private static ApplicationUser GenerateApplicationUser(DateTimeOffset dates)
         {
             var applicationUser = new ApplicationUser
@@ -81,7 +81,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 UpdatedDate = dates
             };
 
-                return applicationUser;
+            return applicationUser;
         }
 
         private static IQueryable<ApplicationUser> CreateRandomApplicationUsers(
@@ -132,16 +132,16 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         }
 
         private static SqlException GetSqlException() =>
-            (SqlException)RuntimeHelpers.GetUninitializedObject(typeof(SqlException));            
+            (SqlException)RuntimeHelpers.GetUninitializedObject(typeof(SqlException));
 
         private static object GetRandomPhoneNumber()
         {
             string plusCode = "+1";
-            
-            var randomPhoneNumber = 
+
+            var randomPhoneNumber =
                new string(Enumerable.Range(1, 10)
                .Select(i => $"{RandomNumberGenerator.GetInt32(0, 10)}"[0]).ToArray());
-            
+
             var phoneNumber = $"{plusCode}+{randomPhoneNumber}";
 
             return phoneNumber;
@@ -152,7 +152,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static string GetRandomString() =>
             new MnemonicString(wordCount: GetRandomNumber()).GetValue();
-        
+
         private static string GetRandomPassword() =>
             new MnemonicString(wordCount: 1, wordMinLength: 8, wordMaxLength: 20).GetValue();
 

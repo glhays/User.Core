@@ -19,11 +19,11 @@ namespace User.Core.Tests.Acceptance.Brokers
         {
             this.webApplicationFactory =
                 new WebApplicationFactory<Startup>();
-            
-            this.httpClient = 
+
+            this.httpClient =
                 this.webApplicationFactory.CreateClient();
-            
-            this.apiFactoryClient = 
+
+            this.apiFactoryClient =
                 new RESTFulApiFactoryClient(this.httpClient);
         }
     }

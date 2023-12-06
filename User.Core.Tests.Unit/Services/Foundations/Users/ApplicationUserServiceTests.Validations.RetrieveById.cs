@@ -34,7 +34,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 new ApplicationUserValidationException(
                     message: "ApplicationUser validation errors occurred, please try again.",
                     innerException: invalidApplicationUserException);
-            
+
             // when
             ValueTask<ApplicationUser> retrieveByIdApplicationUserTask =
                 this.applicationUserService.RetrieveUserByIdAsync(

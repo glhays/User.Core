@@ -74,13 +74,13 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         {
             // given
             ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
-            ApplicationUser alreadyExistsUser = randomApplicationUser;
+            ApplicationUser alreadyExistsApplicationUser = randomApplicationUser;
             string randomMessage = GetRandomString();
 
             var duplicateKeyException =
                 new DuplicateKeyException(randomMessage);
 
-            var alreadyExistsUserException =
+            var alreadyExistsApplicationUserException =
                 new AlreadyExistsApplicationUserException(
                     message: "ApplicationUser already exists with this id.",
                     innerException: duplicateKeyException);
@@ -88,7 +88,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             var expectedApplicationUserDependencyValidationException =
                 new ApplicationUserDependencyValidationException(
                     message: "ApplicationUser dependency validation occurred, fix and try again.",
-                    innerException: alreadyExistsUserException);
+                    innerException: alreadyExistsApplicationUserException);
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetCurrentDateTimeOffset())
@@ -166,7 +166,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
                     Times.Once);
-            
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationDependencyException))),
@@ -219,7 +219,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
                     Times.Once);
-            
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationUserServiceException))),

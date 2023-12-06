@@ -146,10 +146,10 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         {
             // given
             DateTimeOffset randomDateTimeoffset = GetRandomDateTimeOffset();
-            
+
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser(randomDateTimeoffset);
-            
+
             ApplicationUser invalidApplicationUser = randomApplicationUser;
 
             var invalidApplicationUserException =
@@ -205,10 +205,10 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         {
             // given
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
-            
+
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser(randomDateTimeOffset);
-            
+
             randomApplicationUser.UpdatedDate = randomDateTimeOffset.AddMinutes(minutes);
 
             var invalidApplicationUserException =
@@ -267,12 +267,12 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser(randomDateTimeOffset);
-            
+
             ApplicationUser nonExistentApplicationUser = randomApplicationUser;
 
             nonExistentApplicationUser.CreatedDate =
                 randomDateTimeOffset.AddMinutes(randomNegativeMinutes);
-            
+
             ApplicationUser nullApplicationUser = null;
             var innerException = new Exception();
 
@@ -338,15 +338,15 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             ApplicationUser invalidApplicationUser = randomApplicationUser.DeepClone();
             ApplicationUser storageApplicationUser = randomApplicationUser.DeepClone();
-            
+
             storageApplicationUser.CreatedDate =
                 storageApplicationUser.CreatedDate.AddMinutes(randomMinutes);
-            
+
             storageApplicationUser.UpdatedDate =
                 storageApplicationUser.UpdatedDate.AddMinutes(randomMinutes);
-            
+
             Guid applicationUserId = invalidApplicationUser.Id;
-            
+
             invalidApplicationUser.CreatedDate =
                 storageApplicationUser.CreatedDate.AddMinutes(randomMinutes);
 
@@ -410,7 +410,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             ApplicationUser randomApplicationUser =
                 CreateRandomModifyApplicationUser(randomDateTimeOffset);
-            
+
             ApplicationUser invalidApplicationUser = randomApplicationUser;
             ApplicationUser storageApplicationUser = randomApplicationUser.DeepClone();
             invalidApplicationUser.UpdatedDate = storageApplicationUser.UpdatedDate;

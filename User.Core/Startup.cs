@@ -28,7 +28,7 @@ namespace User.Core
             services.AddTransient<IStorageBroker, StorageBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
             services.AddTransient<IDateTimeBroker, DateTimeBroker>();
-            
+
 
             services.AddSwaggerGen(options =>
             {

@@ -15,7 +15,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
     public partial class ApplicationUserServiceTests
     {
         [Fact]
-        private async Task ShouldRetrieveApplicationUserById()
+        private async Task ShouldRetrieveApplicationUserByIdAsync()
         {
             //given
             ApplicationUser randomApplicationUser =

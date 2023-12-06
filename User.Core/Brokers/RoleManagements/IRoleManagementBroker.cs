@@ -3,9 +3,9 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System;
 using User.Core.Models.Roles;
 
 namespace User.Core.Brokers.RoleManagements

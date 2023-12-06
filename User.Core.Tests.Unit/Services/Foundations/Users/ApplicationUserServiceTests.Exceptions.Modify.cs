@@ -84,7 +84,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
 
             ApplicationUser randomApplicationUser =
-                CreateRandomApplicationUser(randomDateTimeOffset); 
+                CreateRandomApplicationUser(randomDateTimeOffset);
 
             randomApplicationUser.CreatedDate =
                 randomDateTimeOffset.AddMinutes(minutesInPast);
@@ -146,7 +146,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             // given
             int minutesInPast = GetRandomNegativeNumber();
             DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
-            
+
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser(randomDateTimeOffset);
 

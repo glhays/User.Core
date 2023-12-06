@@ -10,13 +10,13 @@ namespace User.Core.Models.Users.Exceptions
     public class ApplicationUserDependencyValidationException : Xeption
     {
         public ApplicationUserDependencyValidationException(Xeption innerException)
-            :base(
+            : base(
                 message: "ApplicationUser dependency validation occurred, fix and try again.",
                 innerException: innerException)
         { }
-        
+
         public ApplicationUserDependencyValidationException(string message, Xeption innerException)
-            :base(message, innerException)
+            : base(message, innerException)
         { }
     }
 }

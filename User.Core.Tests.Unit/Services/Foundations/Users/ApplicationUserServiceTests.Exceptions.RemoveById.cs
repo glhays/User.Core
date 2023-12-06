@@ -3,15 +3,15 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using System.Threading.Tasks;
 using System;
-using User.Core.Models.Users.Exceptions;
-using User.Core.Models.Users;
-using Xunit;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using User.Core.Models.Users;
+using User.Core.Models.Users.Exceptions;
+using Xunit;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -55,7 +55,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.userManagementBrokerMock.Verify(broker =>
                 broker.SelectUserByIdAsync(It.IsAny<Guid>()),
                     Times.Once());
-            
+
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationUserDependencyValidationException))),
@@ -98,7 +98,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             // then
             actualApplicationUserDependencyException.Should().BeEquivalentTo(
                 expectedApplicationUserDependencyException);
-            
+
             this.userManagementBrokerMock.Verify(broker =>
                 broker.SelectUserByIdAsync(It.IsAny<Guid>()),
                     Times.Once);

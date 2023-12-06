@@ -16,17 +16,18 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
     public partial class ApplicationUserServiceTests
     {
         [Fact]
-        private async Task ShouldReturnAllApplicationUsers()
+        private async Task ShouldReturnAllApplicationUsersAsync()
         {
             // given
-            DateTimeOffset randomDateTimeOffset = GetRandomDateTimeOffset();
+            DateTimeOffset randomDateTimeOffset =
+                GetRandomDateTimeOffset();
 
             IQueryable<ApplicationUser> randomApplicationUsers =
                 CreateRandomApplicationUsers(randomDateTimeOffset);
 
             IQueryable<ApplicationUser> storageApplicationUsers =
                 randomApplicationUsers;
-            
+
             IQueryable<ApplicationUser> expectedApplicationUsers =
                 storageApplicationUsers;
 

@@ -11,12 +11,12 @@ namespace User.Core.Models.Users.Exceptions
     public class FailedApplicationUserStorageException : Xeption
     {
         public FailedApplicationUserStorageException(Exception innerException)
-            :base(message: "Failed ApplicationUser storage error occurred, contact support.",
+            : base(message: "Failed ApplicationUser storage error occurred, contact support.",
                  innerException: innerException)
         { }
-        
+
         public FailedApplicationUserStorageException(string message, Exception innerException)
-            :base(message, innerException)
+            : base(message, innerException)
         { }
     }
 }

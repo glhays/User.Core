@@ -3,13 +3,13 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
-using Moq;
-using System.Threading.Tasks;
 using System;
-using Xunit;
-using User.Core.Models.Users;
-using Force.DeepCloner;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Force.DeepCloner;
+using Moq;
+using User.Core.Models.Users;
+using Xunit;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -20,7 +20,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         {
             // given
             int minuteInPast = GetRandomNegativeNumber();
-            
+
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 

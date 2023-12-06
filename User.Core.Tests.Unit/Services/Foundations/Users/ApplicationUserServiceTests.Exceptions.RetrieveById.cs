@@ -3,11 +3,11 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 using Xunit;

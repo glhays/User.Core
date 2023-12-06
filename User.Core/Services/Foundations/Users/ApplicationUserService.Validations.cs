@@ -4,7 +4,6 @@
 // -----------------------------------------------------------
 
 using System;
-using System.Data;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -33,9 +32,32 @@ namespace User.Core.Services.Foundations.Users
                     secondDate: applicationUser.CreatedDate,
                     secondDateName: nameof(ApplicationUser.CreatedDate)),
                 Parameter: nameof(ApplicationUser.UpdatedDate)),
-                
+
                 (Rule: IsNotRecent(applicationUser.CreatedDate),
                     Parameter: nameof(ApplicationUser.CreatedDate)));
+        }
+
+        private void ValidateApplicationUserOnModify(ApplicationUser applicationUser)
+        {
+            ValidateApplicationUserIsNotNull(applicationUser);
+
+            Validate(
+                (Rule: IsInvalid(applicationUser.FirstName), Parameter: nameof(ApplicationUser.FirstName)),
+                (Rule: IsInvalid(applicationUser.LastName), Parameter: nameof(ApplicationUser.LastName)),
+                (Rule: IsInvalid(applicationUser.UserName), Parameter: nameof(ApplicationUser.UserName)),
+                (Rule: IsInvalid(applicationUser.PhoneNumber), Parameter: nameof(ApplicationUser.PhoneNumber)),
+                (Rule: IsInvalid(applicationUser.Email), Parameter: nameof(ApplicationUser.Email)),
+                (Rule: IsInvalid(applicationUser.CreatedDate), Parameter: nameof(ApplicationUser.CreatedDate)),
+                (Rule: IsInvalid(applicationUser.UpdatedDate), Parameter: nameof(ApplicationUser.UpdatedDate)),
+
+                (Rule: IsSame(
+                    firstDate: applicationUser.UpdatedDate,
+                    secondDate: applicationUser.CreatedDate,
+                    secondDateName: nameof(ApplicationUser.CreatedDate)),
+                Parameter: nameof(ApplicationUser.UpdatedDate)),
+
+                (Rule: IsNotRecent(applicationUser.UpdatedDate),
+                    Parameter: nameof(ApplicationUser.UpdatedDate)));
         }
 
         private dynamic IsNotRecent(DateTimeOffset date) => new
@@ -76,6 +98,24 @@ namespace User.Core.Services.Foundations.Users
             }
         }
 
+        private static void ValidateAgainstStorageApplicationUserOnModify(
+            ApplicationUser inputApplicationUser,
+            ApplicationUser storageApplicationUser)
+        {
+            Validate(
+                (Rule: IsNotSame(
+                    firstDate: inputApplicationUser.CreatedDate,
+                    secondDate: storageApplicationUser.CreatedDate,
+                    secondDateName: nameof(ApplicationUser.CreatedDate)),
+                Parameter: nameof(ApplicationUser.CreatedDate)),
+
+                (Rule: IsSame(
+                    firstDate: inputApplicationUser.UpdatedDate,
+                    secondDate: storageApplicationUser.UpdatedDate,
+                    secondDateName: nameof(ApplicationUser.UpdatedDate)),
+                Parameter: nameof(ApplicationUser.UpdatedDate)));
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,
@@ -101,6 +141,15 @@ namespace User.Core.Services.Foundations.Users
             {
                 Condition = firstDate != secondDate,
                 Message = $"Date is not the same as {secondDateName}."
+            };
+
+        private static dynamic IsSame(
+            DateTimeOffset firstDate,
+            DateTimeOffset secondDate,
+            string secondDateName) => new
+            {
+                Condition = firstDate == secondDate,
+                Message = $"Date is the same as {secondDateName}."
             };
 
         private static void Validate(params (dynamic Rule, string Parameter)[]

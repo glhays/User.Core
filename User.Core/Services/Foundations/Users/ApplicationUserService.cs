@@ -53,6 +53,38 @@ namespace User.Core.Services.Foundations.Users
         });
 
         public IQueryable<ApplicationUser> RetrieveAllUsers() =>
-        TryCatch(() =>  this.userManagementBroker.SelectAllUsers());
+        TryCatch(() => this.userManagementBroker.SelectAllUsers());
+
+        public ValueTask<ApplicationUser> ModifyUserAsync(ApplicationUser user) =>
+        TryCatch(async () =>
+        {
+            ValidateApplicationUserOnModify(user);
+
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(user.Id);
+
+            ValidateStorageApplicationUser(maybeApplicationUser, user.Id);
+
+            ValidateAgainstStorageApplicationUserOnModify(
+                inputApplicationUser: user,
+                storageApplicationUser: maybeApplicationUser);
+
+            return await this.userManagementBroker.UpdateUserAsync(user);
+
+        });
+
+        public ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId) =>
+        TryCatch(async () =>
+        {
+            ValidateApplicationUserId(applicationUserId);
+
+            ApplicationUser maybeApplicationUser =
+                await this.userManagementBroker.SelectUserByIdAsync(applicationUserId);
+
+            ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
+
+            return await this.userManagementBroker.DeleteUserAsync(maybeApplicationUser);
+
+        });
     }
 }

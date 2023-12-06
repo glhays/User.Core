@@ -12,10 +12,10 @@ namespace User.Core.Brokers.SignInManagements
     public interface ISignInManagementBroker
     {
         ValueTask SignOutAsync();
-        
+
         ValueTask<SignInResult> PasswordSignInAsync(
             ApplicationUser user, string password, bool isPersistent, bool lockoutOnFailure);
-        
+
         ValueTask<SignInResult> TwoFactorSignInAsync(
             string provider, string code, bool isPersistent, bool rememberClient);
     }

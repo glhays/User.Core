@@ -11,13 +11,13 @@ namespace User.Core.Models.Users.Exceptions
     public class AlreadyExistsApplicationUserException : Xeption
     {
         public AlreadyExistsApplicationUserException(Exception innerException)
-            :base(
+            : base(
                 message: "ApplicationUser already exists with this id.",
                 innerException: innerException)
         { }
-        
+
         public AlreadyExistsApplicationUserException(string message, Exception innerException)
-            :base(message, innerException)
+            : base(message, innerException)
         { }
     }
 }

@@ -54,6 +54,13 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogDependencyValidationException(alreadyExistsApplicationUserException);
             }
+            catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                var lockedApplicationUserException =
+                    new LockedApplicationUserException(dbUpdateConcurrencyException);
+
+                throw CreateAndLogDependencyValidationException(lockedApplicationUserException);
+            }
             catch (DbUpdateException dbUpdateException)
             {
                 var failedApplicationUserStorageException =
@@ -121,9 +128,9 @@ namespace User.Core.Services.Foundations.Users
         {
             var applicationUserDependencyValidationException =
                 new ApplicationUserDependencyValidationException(exception);
-            
+
             this.loggingBroker.LogError(applicationUserDependencyValidationException);
-            
+
             return applicationUserDependencyValidationException;
         }
 

@@ -3,20 +3,21 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
+using System;
 using Xeptions;
 
 namespace User.Core.Models.Users.Exceptions
 {
-    public class ApplicationUserDependencyValidationException : Xeption
+    public class LockedApplicationUserException : Xeption
     {
-        public ApplicationUserDependencyValidationException(Xeption innerException)
+        public LockedApplicationUserException(Exception innerException)
             : base(
-                message: "ApplicationUser dependency validation occurred, fix and try again.",
+                message: "ApplicationUser is currently locked, please try again.",
                 innerException: innerException)
         { }
 
-        public ApplicationUserDependencyValidationException(string message, Xeption innerException)
-            : base(message, innerException)
+        public LockedApplicationUserException(string message, Exception innerException)
+            : base(message: message, innerException: innerException)
         { }
     }
 }

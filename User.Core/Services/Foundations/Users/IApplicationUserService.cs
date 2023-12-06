@@ -15,5 +15,7 @@ namespace User.Core.Services.Foundations.Users
         ValueTask<ApplicationUser> AddUserAsync(ApplicationUser user, string password);
         ValueTask<ApplicationUser> RetrieveUserByIdAsync(Guid applicationUserId);
         IQueryable<ApplicationUser> RetrieveAllUsers();
+        ValueTask<ApplicationUser> ModifyUserAsync(ApplicationUser user);
+        ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId);
     }
 }

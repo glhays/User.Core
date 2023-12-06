@@ -3,11 +3,11 @@
 // ======= FREE TO USE FOR THE WORLD =======
 // -----------------------------------------------------------
 
-using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System;
+using Microsoft.AspNetCore.Identity;
 using User.Core.Models.Users;
 
 namespace User.Core.Brokers.UserManagements

@@ -11,12 +11,12 @@ namespace User.Core.Models.Users.Exceptions
     public class NullApplicationUserException : Xeption
     {
         public NullApplicationUserException()
-            :base(
+            : base(
             message: "ApplicationUser is null, please fix and try again.")
-        {}
-        
+        { }
+
         public NullApplicationUserException(string message, Exception innerException)
-            :base(message, innerException)
-        {}
+            : base(message, innerException)
+        { }
     }
 }

@@ -7,7 +7,6 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Force.DeepCloner;
-using Microsoft.AspNetCore.Identity;
 using Moq;
 using User.Core.Models.Users;
 using Xunit;
@@ -17,42 +16,50 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
     public partial class ApplicationUserServiceTests
     {
         [Fact]
-        private async Task ShouldAddApplicationUserAsync()
+        private async Task ShouldModifyApplicationUserAsync()
         {
             // given
+            int minuteInPast = GetRandomNegativeNumber();
+
             DateTimeOffset randomDateTimeOffset =
                 GetRandomDateTimeOffset();
 
-            DateTimeOffset dateTimeOffset =
-                randomDateTimeOffset;
-
             ApplicationUser randomApplicationUser =
-                CreateRandomApplicationUser(dateTimeOffset);
+                CreateRandomModifyApplicationUser(
+                    randomDateTimeOffset.AddMinutes(minuteInPast));
 
             ApplicationUser inputApplicationUser =
-                randomApplicationUser;
+                randomApplicationUser.DeepClone();
+
+            inputApplicationUser.UpdatedDate = randomDateTimeOffset;
 
             ApplicationUser storageApplicationUser =
+                randomApplicationUser;
+
+            ApplicationUser updatedApplicationUser =
                 inputApplicationUser;
 
             ApplicationUser expectedApplicationUser =
-                storageApplicationUser.DeepClone();
+                updatedApplicationUser.DeepClone();
 
-            string inputPassword = GetRandomString();
+            Guid userId = inputApplicationUser.Id;
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetCurrentDateTimeOffset())
                     .Returns(randomDateTimeOffset);
 
             this.userManagementBrokerMock.Setup(broker =>
-                broker.InsertUserAsync(
-                    inputApplicationUser, inputPassword))
-                        .ReturnsAsync(IdentityResult.Success);
+                broker.SelectUserByIdAsync(inputApplicationUser.Id))
+                    .ReturnsAsync(storageApplicationUser);
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.UpdateUserAsync(inputApplicationUser))
+                    .ReturnsAsync(updatedApplicationUser);
 
             // when
             ApplicationUser actualApplicationUser =
-                await this.applicationUserService.AddUserAsync(
-                    inputApplicationUser, inputPassword);
+                await this.applicationUserService.ModifyUserAsync(
+                    inputApplicationUser);
 
             // then
             actualApplicationUser.Should().BeEquivalentTo(
@@ -60,12 +67,15 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
             this.dateTimeBrokerMock.Verify(broker =>
                 broker.GetCurrentDateTimeOffset(),
-                    Times.Once());
+                    Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>
-                broker.InsertUserAsync(
-                    inputApplicationUser, inputPassword),
-                Times.Once());
+                broker.SelectUserByIdAsync(inputApplicationUser.Id),
+                Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.UpdateUserAsync(inputApplicationUser),
+                Times.Once);
 
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();

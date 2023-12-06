@@ -17,10 +17,10 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
     public partial class ApplicationUserServiceTests
     {
         [Fact]
-        private async Task ShouldThrowValidationExceptionOnRetrieveByIdIfIdIsInvalidAndLogItAsync()
+        private async Task ShouldThrowValidationExceptionOnModifyIfIdIsInvalidAndLogItAsync()
         {
             // given
-            var invalidApplicationUserId = Guid.Empty;
+            Guid invalidApplicationUserId = Guid.Empty;
 
             var invalidApplicationUserException =
                 new InvalidApplicationUserException(
@@ -36,22 +36,21 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     innerException: invalidApplicationUserException);
 
             // when
-            ValueTask<ApplicationUser> retrieveByIdApplicationUserTask =
-                this.applicationUserService.RetrieveUserByIdAsync(
-                    invalidApplicationUserId);
-
-            ApplicationUserValidationException actualApplicationUserValidationException =
-                await Assert.ThrowsAsync<ApplicationUserValidationException>(
-                    retrieveByIdApplicationUserTask.AsTask);
+            ValueTask<ApplicationUser> removeApplicationUserByIdTask =
+                this.applicationUserService.RemoveUserByIdAsync(invalidApplicationUserId);
 
             // then
-            actualApplicationUserValidationException.Should().BeEquivalentTo(
-                expectedApplicationUserValidationException);
+            await Assert.ThrowsAsync<ApplicationUserValidationException>(() =>
+               removeApplicationUserByIdTask.AsTask());
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
-                    actualApplicationUserValidationException))),
-                    Times.Once);
+                    expectedApplicationUserValidationException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.DeleteUserAsync(It.IsAny<ApplicationUser>()),
+                    Times.Never);
 
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();
@@ -59,14 +58,14 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         }
 
         [Fact]
-        private async Task ShouldThrowValidationExceptionOnRetrieveByIdIfApplicationUserIsNotFoundAndLogItAsync()
+        private async Task ShouldThrowValidationExceptionOnRemoveByIdIfNotFoundAndLogItAsync()
         {
             // given
             Guid someApplicationUserId = Guid.NewGuid();
             ApplicationUser nullApplicationUser = null;
             var innerException = new Exception();
 
-            var notFoundApplicationUserValidationException =
+            var notFoundApplicationUserException =
                 new NotFoundApplicationUserException(
                     message: $"ApplicationUser not found with id: {someApplicationUserId}.",
                     innerException: innerException.InnerException.As<Xeption>());
@@ -74,19 +73,19 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             var expectedApplicationUserValidationException =
                 new ApplicationUserValidationException(
                     message: "ApplicationUser validation errors occurred, please try again.",
-                    innerException: notFoundApplicationUserValidationException);
+                    innerException: notFoundApplicationUserException);
 
             this.userManagementBrokerMock.Setup(broker =>
                 broker.SelectUserByIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(nullApplicationUser);
 
             // when
-            ValueTask<ApplicationUser> retrieveByIdApplicationUserTask =
+            ValueTask<ApplicationUser> removeApplicationUserByIdTask =
                 this.applicationUserService.RetrieveUserByIdAsync(someApplicationUserId);
 
             ApplicationUserValidationException actualApplicationUserValidationException =
                 await Assert.ThrowsAsync<ApplicationUserValidationException>(
-                    retrieveByIdApplicationUserTask.AsTask);
+                    removeApplicationUserByIdTask.AsTask);
 
             // then
             actualApplicationUserValidationException.Should().BeEquivalentTo(
@@ -100,6 +99,10 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 broker.LogError(It.Is(SameExceptionAs(
                     expectedApplicationUserValidationException))),
                         Times.Once());
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.DeleteUserAsync(It.IsAny<ApplicationUser>()),
+                    Times.Never);
 
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.loggingBrokerMock.VerifyNoOtherCalls();

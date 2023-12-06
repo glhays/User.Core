@@ -43,9 +43,12 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static ApplicationUser CreateRandomApplicationUser() =>
             GenerateApplicationUser();
-        
+
         private static ApplicationUser CreateRandomApplicationUser(DateTimeOffset date) =>
             GenerateApplicationUser(date);
+
+        private static ApplicationUser CreateRandomModifyApplicationUser(DateTimeOffset date) =>
+            GenerateRandomModifyApplicationUser(date);
 
         private static ApplicationUser GenerateApplicationUser()
         {
@@ -61,9 +64,9 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 UpdatedDate = DateTimeOffset.UtcNow
             };
 
-                return applicationUser;
+            return applicationUser;
         }
-        
+
         private static ApplicationUser GenerateApplicationUser(DateTimeOffset dates)
         {
             var applicationUser = new ApplicationUser
@@ -78,7 +81,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 UpdatedDate = dates
             };
 
-                return applicationUser;
+            return applicationUser;
         }
 
         private static IQueryable<ApplicationUser> CreateRandomApplicationUsers(
@@ -106,17 +109,39 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             return applicationUsers.AsQueryable();
         }
 
+        private static ApplicationUser GenerateRandomModifyApplicationUser(DateTimeOffset dates)
+        {
+            var randomDaysInPast = GetRandomNegativeNumber();
+
+            var randomModifyApplicationUser = new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                Email = new EmailAddresses().GetValue(),
+                FirstName = new RealNames(NameStyle.FirstName).GetValue(),
+                LastName = new RealNames(NameStyle.LastName).GetValue(),
+                UserName = new MnemonicString(wordCount: 1, 8, 15).GetValue(),
+                PhoneNumber = GetRandomPhoneNumber().ToString(),
+                CreatedDate = dates,
+                UpdatedDate = dates
+            };
+
+            randomModifyApplicationUser.CreatedDate =
+                randomModifyApplicationUser.CreatedDate.AddDays(randomDaysInPast);
+
+            return randomModifyApplicationUser;
+        }
+
         private static SqlException GetSqlException() =>
-            (SqlException)RuntimeHelpers.GetUninitializedObject(typeof(SqlException));            
+            (SqlException)RuntimeHelpers.GetUninitializedObject(typeof(SqlException));
 
         private static object GetRandomPhoneNumber()
         {
             string plusCode = "+1";
-            
-            var randomPhoneNumber = 
+
+            var randomPhoneNumber =
                new string(Enumerable.Range(1, 10)
                .Select(i => $"{RandomNumberGenerator.GetInt32(0, 10)}"[0]).ToArray());
-            
+
             var phoneNumber = $"{plusCode}+{randomPhoneNumber}";
 
             return phoneNumber;
@@ -127,7 +152,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 
         private static string GetRandomString() =>
             new MnemonicString(wordCount: GetRandomNumber()).GetValue();
-        
+
         private static string GetRandomPassword() =>
             new MnemonicString(wordCount: 1, wordMinLength: 8, wordMaxLength: 20).GetValue();
 
@@ -146,6 +171,18 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             {
                 randomNumber,
                 randomNegativeNumber
+            };
+        }
+
+        public static IEnumerable<object[]> InvalidMinuteCases()
+        {
+            int randomMoreThanMinuteFromNow = GetRandomNumber();
+            int randomMoreThanMinuteBeforeNow = GetRandomNegativeNumber();
+
+            return new List<object[]>
+            {
+                new object[] { randomMoreThanMinuteFromNow },
+                new object[] { randomMoreThanMinuteBeforeNow}
             };
         }
 

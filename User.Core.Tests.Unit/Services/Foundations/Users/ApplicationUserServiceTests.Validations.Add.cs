@@ -166,7 +166,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                     .Returns(invalidApplicationUser.CreatedDate);
 
             // when
-            ValueTask<ApplicationUser> addApplicationUserTask = 
+            ValueTask<ApplicationUser> addApplicationUserTask =
                 this.applicationUserService.AddUserAsync(
                     invalidApplicationUser, GetRandomPassword());
 
@@ -186,7 +186,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
                 broker.LogError(It.Is(SameExceptionAs(
                     actualApplicationUserValidationException))),
                     Times.Once);
-            
+
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
             this.userManagementBrokerMock.VerifyNoOtherCalls();

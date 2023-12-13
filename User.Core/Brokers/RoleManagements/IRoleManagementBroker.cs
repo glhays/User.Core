@@ -12,10 +12,10 @@ namespace User.Core.Brokers.RoleManagements
 {
     public interface IRoleManagementBroker
     {
-        ValueTask<ApplicationRole> InsertRoleAsync(ApplicationRole user);
-        IQueryable<ApplicationRole> SelectAllRoles();
-        ValueTask<ApplicationRole> SelectRoleByIdAsync(Guid userId);
-        ValueTask<ApplicationRole> UpdateRoleAsync(ApplicationRole user);
-        ValueTask<ApplicationRole> DeleteRoleAsync(ApplicationRole user);
+        ValueTask<UserRole> InsertRoleAsync(UserRole userRole);
+        IQueryable<UserRole> SelectAllRoles();
+        ValueTask<UserRole> SelectRoleByIdAsync(Guid userId);
+        ValueTask<UserRole> UpdateRoleAsync(UserRole userRole);
+        ValueTask<UserRole> DeleteRoleAsync(UserRole userRole);
     }
 }

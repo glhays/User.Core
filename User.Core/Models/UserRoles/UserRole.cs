@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace User.Core.Models.Roles
 {
-    public class ApplicationRole : IdentityRole<Guid>
+    public class UserRole : IdentityRole<Guid>
     {
+
     }
 }

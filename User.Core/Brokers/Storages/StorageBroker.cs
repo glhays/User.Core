@@ -15,7 +15,7 @@ using User.Core.Models.Users;
 namespace User.Core.Brokers.Storages
 {
     public partial class StorageBroker : EFxceptionsIdentityContext<
-        ApplicationUser, ApplicationRole, Guid>, IStorageBroker
+        ApplicationUser, UserRole, Guid>, IStorageBroker
     {
         private readonly IConfiguration configuration;
 

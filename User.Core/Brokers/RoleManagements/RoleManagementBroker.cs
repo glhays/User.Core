@@ -12,27 +12,27 @@ namespace User.Core.Brokers.RoleManagements
 {
     public class RoleManagementBroker : IRoleManagementBroker
     {
-        public ValueTask<ApplicationRole> InsertRoleAsync(ApplicationRole user)
+        public ValueTask<UserRole> InsertRoleAsync(UserRole userRole)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<ApplicationRole> SelectAllRoles()
+        public IQueryable<UserRole> SelectAllRoles()
         {
             throw new NotImplementedException();
         }
 
-        public ValueTask<ApplicationRole> SelectRoleByIdAsync(Guid userId)
+        public ValueTask<UserRole> SelectRoleByIdAsync(Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public ValueTask<ApplicationRole> UpdateRoleAsync(ApplicationRole user)
+        public ValueTask<UserRole> UpdateRoleAsync(UserRole userRole)
         {
             throw new NotImplementedException();
         }
 
-        public ValueTask<ApplicationRole> DeleteRoleAsync(ApplicationRole user)
+        public ValueTask<UserRole> DeleteRoleAsync(UserRole userRole)
         {
             throw new NotImplementedException();
         }

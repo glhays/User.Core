@@ -91,7 +91,7 @@ namespace User.Core.Services.Foundations.Users
             ApplicationUser user, string token, string password) =>
         TryCatch(async () =>
         {
-            ValidateApplicationUserOnModify(user);
+            ValidateOnModifyPassword(user);
 
         var maybeResult =
             await this.userManagementBroker.UpdateUserPasswordAsync(user, token, password);

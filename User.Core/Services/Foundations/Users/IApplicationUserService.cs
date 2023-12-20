@@ -17,5 +17,7 @@ namespace User.Core.Services.Foundations.Users
         IQueryable<ApplicationUser> RetrieveAllUsers();
         ValueTask<ApplicationUser> ModifyUserAsync(ApplicationUser user);
         ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId);
+
+        ValueTask<ApplicationUser> ModifyUserPasswordAsync(ApplicationUser user, string token, string password);
     }
 }

@@ -86,5 +86,11 @@ namespace User.Core.Services.Foundations.Users
             return await this.userManagementBroker.DeleteUserAsync(maybeApplicationUser);
 
         });
+
+        public async ValueTask<ApplicationUser> ModifyUserPasswordAsync(
+            ApplicationUser user, string token, string password)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

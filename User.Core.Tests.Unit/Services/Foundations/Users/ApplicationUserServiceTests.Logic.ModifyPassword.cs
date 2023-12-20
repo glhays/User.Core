@@ -26,7 +26,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             ApplicationUser storageApplicationUser = randomApplicationUser;
             ApplicationUser expectedApplicationUser = storageApplicationUser;
             string password = GetRandomPassword();
-            string token = GetRandomPassword();
+            string token = GetRandomWord();
 
             this.dateTimeBrokerMock.Setup(broker =>
                 broker.GetCurrentDateTimeOffset())

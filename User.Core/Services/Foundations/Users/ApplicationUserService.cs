@@ -90,7 +90,10 @@ namespace User.Core.Services.Foundations.Users
         public async ValueTask<ApplicationUser> ModifyUserPasswordAsync(
             ApplicationUser user, string token, string password)
         {
-            throw new NotImplementedException();
+            var maybeResult =
+                await this.userManagementBroker.UpdateUserPasswordAsync(user, token, password);
+
+            return user;
         }
     }
 }

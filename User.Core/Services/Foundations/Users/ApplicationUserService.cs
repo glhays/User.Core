@@ -87,13 +87,17 @@ namespace User.Core.Services.Foundations.Users
 
         });
 
-        public async ValueTask<ApplicationUser> ModifyUserPasswordAsync(
-            ApplicationUser user, string token, string password)
+        public ValueTask<ApplicationUser> ModifyUserPasswordAsync(
+            ApplicationUser user, string token, string password) =>
+        TryCatch(async () =>
         {
-            var maybeResult =
-                await this.userManagementBroker.UpdateUserPasswordAsync(user, token, password);
+            ValidateApplicationUserOnModify(user);
 
-            return user;
-        }
+        var maybeResult =
+            await this.userManagementBroker.UpdateUserPasswordAsync(user, token, password);
+
+        return user;
+
+        });
     }
 }

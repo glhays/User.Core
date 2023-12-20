@@ -60,6 +60,11 @@ namespace User.Core.Services.Foundations.Users
                     Parameter: nameof(ApplicationUser.UpdatedDate)));
         }
 
+        private void ValidateOnModifyPassword(ApplicationUser applicationUser)
+        {
+            ValidateApplicationUserIsNotNull(applicationUser);
+        }
+
         private dynamic IsNotRecent(DateTimeOffset date) => new
         {
             Condition = IsDateNotRecent(date),

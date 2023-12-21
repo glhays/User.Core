@@ -83,5 +83,67 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.loggingBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowDependencyExceptionOnModifyPasswordIfDatabaseUpdateExceptionOccursAndLogItAsync()
+        {
+            // given
+            var someToken = GetRandomWord();
+            var somePassword = GetRandomPassword();
+
+            ApplicationUser randomApplicationUser =
+                CreateRandomApplicationUser();
+
+            var dbUpdateException = new DbUpdateException();
+
+            var failedApplicationUserException =
+                new FailedApplicationUserStorageException(
+                    message: "Failed ApplicationUser storage error occurred, contact support.",
+                    innerException: dbUpdateException);
+
+            var expectedApplicationUserDependencyException =
+                new ApplicationUserDependencyException(
+                    message: "ApplicationUser dependency error occurred, contact support.",
+                    innerException: failedApplicationUserException);
+
+
+            this.userManagementBrokerMock.Setup(broker =>
+                broker.UpdateUserPasswordAsync(
+                    randomApplicationUser, someToken, somePassword))
+                    .ThrowsAsync(dbUpdateException);
+
+            // when
+            ValueTask<ApplicationUser> userModifyPasswordTask =
+                this.applicationUserService.ModifyUserPasswordAsync(
+                    randomApplicationUser , someToken, somePassword);
+
+            ApplicationUserDependencyException actualApplicationUserDependencyException =
+                await Assert.ThrowsAsync<ApplicationUserDependencyException>(
+                    userModifyPasswordTask.AsTask);
+
+            // then
+            actualApplicationUserDependencyException.Should().BeEquivalentTo(
+                expectedApplicationUserDependencyException);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.UpdateUserPasswordAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                    Times.Once);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserDependencyException))),
+                        Times.Once);
+
+            this.dateTimeBrokerMock.Verify(broker =>
+                broker.GetCurrentDateTimeOffset(),
+                    Times.Never);
+
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

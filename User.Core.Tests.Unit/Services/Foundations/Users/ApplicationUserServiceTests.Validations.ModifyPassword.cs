@@ -75,42 +75,42 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         {
             // given
             ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
-            var invalidPassword = invalidText;
             var invalidToken = invalidText;
+            var invalidPassword = invalidText;
 
             var invalidApplicationUserModifyPasswordException =
                 new InvalidApplicationUserModifyPasswordException(
                     message: "Invalid modify password occurred, correct errors to continue.");
-
-            invalidApplicationUserModifyPasswordException.AddData(
-                key: nameof(invalidPassword),
-                values: "Text is required");
             
             invalidApplicationUserModifyPasswordException.AddData(
                 key: nameof(invalidToken),
                 values: "Text is required");
 
-            var expectedApplicationUserValidationException =
-                new ApplicationUserValidationException(
-                    message: "ApplicationUser validation errors occurred, please try again.",
+            invalidApplicationUserModifyPasswordException.AddData(
+                key: nameof(invalidPassword),
+                values: "Text is required");
+
+            var expectedApplicationUserModifyPasswordValidationException =
+                new ApplicationUserModifyPasswordValidationException(
+                    message: "User modify password validation errors occurred, please try again.",
                     innerException: invalidApplicationUserModifyPasswordException);
 
             // when
-            ValueTask<ApplicationUser> applicationUserTask =
+            ValueTask<ApplicationUser> applicationUserModifyPasswordTask =
                 this.applicationUserService.ModifyUserPasswordAsync(
                     randomApplicationUser, invalidToken, invalidPassword);
 
-            ApplicationUserValidationException actualUserValidationException =
-              await Assert.ThrowsAsync<ApplicationUserValidationException>(
-                  applicationUserTask.AsTask);
+            ApplicationUserModifyPasswordValidationException actualUserModifyPasswordValidationException =
+              await Assert.ThrowsAsync<ApplicationUserModifyPasswordValidationException>(
+                  applicationUserModifyPasswordTask.AsTask);
 
             // then
-            actualUserValidationException.Should().BeEquivalentTo(
-                expectedApplicationUserValidationException);
+            actualUserModifyPasswordValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserModifyPasswordValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
-                    expectedApplicationUserValidationException))),
+                    expectedApplicationUserModifyPasswordValidationException))),
                         Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>

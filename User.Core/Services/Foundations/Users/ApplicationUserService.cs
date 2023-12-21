@@ -95,5 +95,8 @@ namespace User.Core.Services.Foundations.Users
 
             return user;
         });
+
+        public async ValueTask<string> RetrieveUserPasswordResetTokenAsync(ApplicationUser user) =>
+            throw new NotImplementedException();
     }
 }

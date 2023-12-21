@@ -153,6 +153,8 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
         private static string GetRandomString() =>
             new MnemonicString(wordCount: GetRandomNumber()).GetValue();
 
+        private static string GetRandomWord() => new MnemonicString().GetValue();
+
         private static string GetRandomPassword() =>
             new MnemonicString(wordCount: 1, wordMinLength: 8, wordMaxLength: 20).GetValue();
 

@@ -35,6 +35,10 @@ namespace User.Core.Services.Foundations.Users
             {
                 throw CreateAndLogValidationException(invalidApplicationUserException);
             }
+            catch (InvalidApplicationUserModifyPasswordException invalidApplicationUserModifyPasswordException)
+            {
+                throw CreateAndLogModifyPasswordValidationException(invalidApplicationUserModifyPasswordException);
+            }
             catch (SqlException sqlException)
             {
                 var failedApplicationUserStorageException =
@@ -99,6 +103,17 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogServiceException(failedApplicationUsersServiceException);
             }
+        }
+
+        private ApplicationUserModifyPasswordValidationException CreateAndLogModifyPasswordValidationException(
+            Xeption exception)
+        {
+            var applicationUserModifyPasswordValidationException =
+                new ApplicationUserModifyPasswordValidationException(exception);
+
+            this.loggingBroker.LogError(applicationUserModifyPasswordValidationException);
+
+            return applicationUserModifyPasswordValidationException;
         }
 
         private ApplicationUserValidationException CreateAndLogValidationException(

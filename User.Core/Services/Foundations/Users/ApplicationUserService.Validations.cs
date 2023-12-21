@@ -4,6 +4,8 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Data;
+using System.Security.Principal;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -58,6 +60,16 @@ namespace User.Core.Services.Foundations.Users
 
                 (Rule: IsNotRecent(applicationUser.UpdatedDate),
                     Parameter: nameof(ApplicationUser.UpdatedDate)));
+        }
+
+        private void ValidateOnModifyPassword(ApplicationUser applicationUser, string invalidToken, string invalidPassword)
+        {
+            ValidateApplicationUserIsNotNull(applicationUser);
+
+            ValidateX(
+                (Rule: IsInvalid(invalidToken), Parameter: nameof(invalidToken)),
+                (Rule: IsInvalid(invalidPassword), Parameter: nameof(invalidPassword))
+                );
         }
 
         private dynamic IsNotRecent(DateTimeOffset date) => new
@@ -169,6 +181,25 @@ namespace User.Core.Services.Foundations.Users
             }
 
             invalidApplicationUser.ThrowIfContainsErrors();
+        }
+        
+        private static void ValidateX(params (dynamic Rule, string Parameter)[]
+            validations)
+        {
+            var invalidModifyPasswordException =
+                new InvalidApplicationUserModifyPasswordException();
+
+            foreach ((dynamic rule, string parameter) in validations)
+            {
+                if (rule.Condition)
+                {
+                    invalidModifyPasswordException.UpsertDataList(
+                        key: parameter,
+                        value: rule.Message);
+                }
+            }
+
+            invalidModifyPasswordException.ThrowIfContainsErrors();
         }
     }
 }

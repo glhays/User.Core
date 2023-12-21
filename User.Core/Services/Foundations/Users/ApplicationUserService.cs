@@ -49,7 +49,6 @@ namespace User.Core.Services.Foundations.Users
             ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
 
             return maybeApplicationUser;
-
         });
 
         public IQueryable<ApplicationUser> RetrieveAllUsers() =>
@@ -70,7 +69,6 @@ namespace User.Core.Services.Foundations.Users
                 storageApplicationUser: maybeApplicationUser);
 
             return await this.userManagementBroker.UpdateUserAsync(user);
-
         });
 
         public ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId) =>
@@ -84,7 +82,18 @@ namespace User.Core.Services.Foundations.Users
             ValidateStorageApplicationUser(maybeApplicationUser, applicationUserId);
 
             return await this.userManagementBroker.DeleteUserAsync(maybeApplicationUser);
+        });
 
+        public ValueTask<ApplicationUser> ModifyUserPasswordAsync(
+            ApplicationUser user, string token, string password) =>
+        TryCatch(async () =>
+        {
+            ValidateOnModifyPassword(user, token, password);
+
+            var maybeResult =
+                await this.userManagementBroker.UpdateUserPasswordAsync(user, token, password);
+
+            return user;
         });
     }
 }

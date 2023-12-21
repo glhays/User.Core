@@ -20,6 +20,9 @@ namespace User.Core.Brokers.UserManagements
         ValueTask<ApplicationUser> UpdateUserAsync(ApplicationUser user);
         ValueTask<ApplicationUser> DeleteUserAsync(ApplicationUser user);
 
+        ValueTask<IdentityResult> UpdateUserPasswordAsync(
+            ApplicationUser user, string token, string password);
+
         ValueTask<ApplicationUser> FindByIdAsync(string id);
         ValueTask<ApplicationUser> FindByNameAsync(string userName);
         ValueTask<ApplicationUser> FindByEmailAsync(string email);
@@ -29,7 +32,6 @@ namespace User.Core.Brokers.UserManagements
         ValueTask<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user);
         ValueTask<bool> CheckPasswordAsync(ApplicationUser user, string password);
         ValueTask<string> GeneratePasswordResetTokenAsync(ApplicationUser user);
-        ValueTask<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string password);
         ValueTask<string> GenerateTwoFactorTokenAsync(ApplicationUser user);
         ValueTask<IdentityResult> SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled);
     }

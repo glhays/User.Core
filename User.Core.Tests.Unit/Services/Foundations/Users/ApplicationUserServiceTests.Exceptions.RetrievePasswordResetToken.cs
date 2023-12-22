@@ -6,8 +6,6 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
@@ -17,7 +15,7 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
     public partial class ApplicationUserServiceTests
     {
-        
+
         [Fact]
         private async Task ShouldThrowServiceExceptionOnRetrievePasswordResetTokenIfServiceErrorOccursAndLogItAsync()
         {

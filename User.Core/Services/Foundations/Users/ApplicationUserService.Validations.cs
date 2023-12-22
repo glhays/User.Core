@@ -4,8 +4,6 @@
 // -----------------------------------------------------------
 
 using System;
-using System.Data;
-using System.Security.Principal;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -196,7 +194,7 @@ namespace User.Core.Services.Foundations.Users
 
             invalidApplicationUser.ThrowIfContainsErrors();
         }
-        
+
         private static void ValidateX(params (dynamic Rule, string Parameter)[]
             validations)
         {

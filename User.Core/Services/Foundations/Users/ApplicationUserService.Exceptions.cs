@@ -18,6 +18,7 @@ namespace User.Core.Services.Foundations.Users
     public partial class ApplicationUserService
     {
         private delegate ValueTask<ApplicationUser> ReturningApplicationUserFunction();
+        private delegate ValueTask<string> ReturningApplicationUserStringFunction();
         private delegate IQueryable<ApplicationUser> ReturningApplicationUsersFunction();
 
         private async ValueTask<ApplicationUser> TryCatch(
@@ -26,6 +27,67 @@ namespace User.Core.Services.Foundations.Users
             try
             {
                 return await returningApplicationUserFunction();
+            }
+            catch (NullApplicationUserException nullApplicationUserException)
+            {
+                throw CreateAndLogValidationException(nullApplicationUserException);
+            }
+            catch (InvalidApplicationUserException invalidApplicationUserException)
+            {
+                throw CreateAndLogValidationException(invalidApplicationUserException);
+            }
+            catch (InvalidApplicationUserModifyPasswordException invalidApplicationUserModifyPasswordException)
+            {
+                throw CreateAndLogModifyPasswordValidationException(invalidApplicationUserModifyPasswordException);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(sqlException);
+
+                throw CreateAndLogCriticalDependencyExcpetion(
+                    failedApplicationUserStorageException);
+            }
+            catch (NotFoundApplicationUserException notFoundApplicationUserException)
+            {
+                throw CreateAndLogValidationException(notFoundApplicationUserException);
+            }
+            catch (DuplicateKeyException duplicateKeyException)
+            {
+                var alreadyExistsApplicationUserException =
+                    new AlreadyExistsApplicationUserException(duplicateKeyException);
+
+                throw CreateAndLogDependencyValidationException(alreadyExistsApplicationUserException);
+            }
+            catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
+            {
+                var lockedApplicationUserException =
+                    new LockedApplicationUserException(dbUpdateConcurrencyException);
+
+                throw CreateAndLogDependencyValidationException(lockedApplicationUserException);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(dbUpdateException);
+
+                throw CreateAndLogDependencyException(failedApplicationUserStorageException);
+            }
+            catch (Exception exception)
+            {
+                var failedApplicationUserServiceException =
+                    new FailedApplicationUserServiceException(exception);
+
+                throw CreateAndLogServiceException(failedApplicationUserServiceException);
+            }
+        }
+        
+        private async ValueTask<string> TryCatch(
+            ReturningApplicationUserStringFunction returningApplicationUserStringFunction)
+        {
+            try
+            {
+                return await returningApplicationUserStringFunction();
             }
             catch (NullApplicationUserException nullApplicationUserException)
             {

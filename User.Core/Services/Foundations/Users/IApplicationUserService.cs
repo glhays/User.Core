@@ -19,5 +19,6 @@ namespace User.Core.Services.Foundations.Users
         ValueTask<ApplicationUser> RemoveUserByIdAsync(Guid applicationUserId);
 
         ValueTask<ApplicationUser> ModifyUserPasswordAsync(ApplicationUser user, string token, string password);
+        ValueTask<string> RetrieveUserPasswordResetTokenAsync(ApplicationUser user);
     }
 }

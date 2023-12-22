@@ -4,8 +4,6 @@
 // -----------------------------------------------------------
 
 using System;
-using System.Data;
-using System.Security.Principal;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 
@@ -70,6 +68,20 @@ namespace User.Core.Services.Foundations.Users
                 (Rule: IsInvalid(invalidToken), Parameter: nameof(invalidToken)),
                 (Rule: IsInvalid(invalidPassword), Parameter: nameof(invalidPassword))
                 );
+        }
+
+        private void ValidateApplicationUser(ApplicationUser applicationUser)
+        {
+            ValidateApplicationUserIsNotNull(applicationUser);
+
+            Validate(
+                (Rule: IsInvalid(applicationUser.FirstName), Parameter: nameof(ApplicationUser.FirstName)),
+                (Rule: IsInvalid(applicationUser.LastName), Parameter: nameof(ApplicationUser.LastName)),
+                (Rule: IsInvalid(applicationUser.UserName), Parameter: nameof(ApplicationUser.UserName)),
+                (Rule: IsInvalid(applicationUser.PhoneNumber), Parameter: nameof(ApplicationUser.PhoneNumber)),
+                (Rule: IsInvalid(applicationUser.Email), Parameter: nameof(ApplicationUser.Email)),
+                (Rule: IsInvalid(applicationUser.CreatedDate), Parameter: nameof(ApplicationUser.CreatedDate)),
+                (Rule: IsInvalid(applicationUser.UpdatedDate), Parameter: nameof(ApplicationUser.UpdatedDate)));
         }
 
         private dynamic IsNotRecent(DateTimeOffset date) => new
@@ -182,7 +194,7 @@ namespace User.Core.Services.Foundations.Users
 
             invalidApplicationUser.ThrowIfContainsErrors();
         }
-        
+
         private static void ValidateX(params (dynamic Rule, string Parameter)[]
             validations)
         {

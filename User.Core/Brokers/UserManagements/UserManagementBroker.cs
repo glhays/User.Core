@@ -58,8 +58,17 @@ namespace User.Core.Brokers.UserManagements
             
             return await broker.userManagement.ResetPasswordAsync(user, token, password);
         }
-            
 
+        public async ValueTask<string> SelectUserPasswordResetTokenAsync(ApplicationUser user)
+        {
+            var broker = new UserManagementBroker(this.userManagement);
+
+            return await broker.userManagement.GeneratePasswordResetTokenAsync(user);
+        }
+
+        public ValueTask<bool> CheckPasswordAsync(ApplicationUser user, string password) =>
+            throw new NotImplementedException();
+           
         public ValueTask<ApplicationUser> FindByIdAsync(string id) =>
             throw new NotImplementedException();
 
@@ -80,13 +89,6 @@ namespace User.Core.Brokers.UserManagements
 
         public ValueTask<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user) =>
             throw new NotImplementedException();
-
-        public ValueTask<bool> CheckPasswordAsync(ApplicationUser user, string password) =>
-            throw new NotImplementedException();
-
-        public ValueTask<string> GeneratePasswordResetTokenAsync(ApplicationUser user) =>
-            throw new NotImplementedException();
-
 
         public ValueTask<string> GenerateTwoFactorTokenAsync(ApplicationUser user) =>
             throw new NotImplementedException();

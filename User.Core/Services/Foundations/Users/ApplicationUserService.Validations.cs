@@ -4,6 +4,7 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Data;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
 

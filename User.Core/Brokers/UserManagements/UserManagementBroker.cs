@@ -66,8 +66,12 @@ namespace User.Core.Brokers.UserManagements
             return await broker.userManagement.GeneratePasswordResetTokenAsync(user);
         }
 
-        public ValueTask<bool> CheckPasswordAsync(ApplicationUser user, string password) =>
-            throw new NotImplementedException();
+        public async ValueTask<bool> SelectPasswordValidationAsync(ApplicationUser user, string password)
+        {
+            var broker = new UserManagementBroker(this.userManagement);
+
+            return await broker.userManagement.CheckPasswordAsync(user, password);
+        }
            
         public ValueTask<ApplicationUser> FindByIdAsync(string id) =>
             throw new NotImplementedException();

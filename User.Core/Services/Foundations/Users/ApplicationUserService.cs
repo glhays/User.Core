@@ -107,7 +107,10 @@ namespace User.Core.Services.Foundations.Users
         public async ValueTask<bool> RetrieveUserPasswordValidationAsync(
             ApplicationUser applicationUser, string password)
         {
-            throw new NotImplementedException();
+            bool validateResult =
+                await this.userManagementBroker.SelectPasswordValidationAsync(applicationUser, password);
+            
+            return validateResult;
         }
     }
 }

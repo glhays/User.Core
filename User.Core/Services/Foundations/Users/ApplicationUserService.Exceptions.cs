@@ -20,6 +20,20 @@ namespace User.Core.Services.Foundations.Users
         private delegate ValueTask<ApplicationUser> ReturningApplicationUserFunction();
         private delegate ValueTask<string> ReturningApplicationUserStringFunction();
         private delegate IQueryable<ApplicationUser> ReturningApplicationUsersFunction();
+        private delegate ValueTask<bool> ReturningApplicationUserBooleanFunction();
+
+        private async ValueTask<bool> TryCatch(
+            ReturningApplicationUserBooleanFunction returningApplicationUserBooleanFunction)
+        {
+            try
+            {
+                return await returningApplicationUserBooleanFunction();
+            }
+            catch (NullApplicationUserException nullApplicationUserException)
+            {
+                throw CreateAndLogValidationException(nullApplicationUserException);
+            }
+        }
 
         private async ValueTask<ApplicationUser> TryCatch(
             ReturningApplicationUserFunction returningApplicationUserFunction)

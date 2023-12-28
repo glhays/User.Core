@@ -62,5 +62,54 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.userManagementBrokerMock.VerifyNoOtherCalls();
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
+
+        [Fact]
+        private async Task ShouldThrowValidationExceptionOnRetrievePasswordValidationIfNotValidAndLogItAsync()
+        {
+            // given
+            ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
+            string somePassword = GetRandomPassword();
+
+            var invalidApplicationUserException =
+                new InvalidApplicationUserException(
+                    message: "Invalid ApplicationUser, correct errors to continue.");
+
+            invalidApplicationUserException.AddData(
+                key: nameof(ApplicationUser),
+                values: "Value is required");
+
+            var expectedApplicationUserValidationException =
+                new ApplicationUserValidationException(
+                    message: "ApplicationUser validation errors occurred, please try again.",
+                    innerException: invalidApplicationUserException);
+
+            // when
+            ValueTask<bool> applicationUserPasswordValidationTask =
+                this.applicationUserService.RetrieveUserPasswordValidationAsync(
+                    randomApplicationUser, somePassword);
+
+            ApplicationUserValidationException actualUserValidationException =
+              await Assert.ThrowsAsync<ApplicationUserValidationException>(
+                  applicationUserPasswordValidationTask.AsTask);
+
+            // then
+            actualUserValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserValidationException);
+
+            this.loggingBrokerMock.Verify(broker =>
+                broker.LogError(It.Is(SameExceptionAs(
+                    expectedApplicationUserValidationException))),
+                        Times.Once);
+
+            this.userManagementBrokerMock.Verify(broker =>
+                broker.SelectPasswordValidationAsync(
+                    It.IsAny<ApplicationUser>(),
+                    It.IsAny<string>()),
+                    Times.Never);
+
+            this.loggingBrokerMock.VerifyNoOtherCalls();
+            this.userManagementBrokerMock.VerifyNoOtherCalls();
+            this.dateTimeBrokerMock.VerifyNoOtherCalls();
+        }
     }
 }

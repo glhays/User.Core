@@ -20,23 +20,21 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser();
 
-            bool inValidPasswordStatus = false;
-            bool somePasswordStatus = inValidPasswordStatus;
-            bool expectedPasswordStatus = somePasswordStatus;
-            string password = GetRandomPassword();
+            string inputPassword = GetRandomPassword();
+            randomApplicationUser.Password = inputPassword;
+            bool expectedPasswordStatus = true;
 
             this.userManagementBrokerMock.Setup(broker =>
-                broker.SelectPasswordValidationAsync(randomApplicationUser, password))
+                broker.SelectPasswordValidationAsync(randomApplicationUser, inputPassword))
                     .ReturnsAsync(expectedPasswordStatus);
 
             // when
             bool actualApplicationUserPasswordValidateTask =
                 await this.applicationUserService.RetrieveUserPasswordValidationAsync(
-                    randomApplicationUser, password);
+                    randomApplicationUser, randomApplicationUser.Password);
 
             // then
-            actualApplicationUserPasswordValidateTask.Should<bool>().Be(
-                expectedPasswordStatus);
+            actualApplicationUserPasswordValidateTask.Should().Be(expectedPasswordStatus);
 
             this.userManagementBrokerMock.Verify(broker =>
                 broker.SelectPasswordValidationAsync(

@@ -109,11 +109,14 @@ namespace User.Core.Services.Foundations.Users
         TryCatch(async () =>
         {
             ValidateApplicationUser(applicationUser);
+            ValidateOnPasswordValidation(password);
 
-            bool validateResult =
+            bool validationResult =
                 await this.userManagementBroker.SelectPasswordValidationAsync(applicationUser, password);
-
-            return validateResult;
+            
+            ValidateApplicationUserPassword(validationResult);
+            
+            return validationResult;
         });
     }
 }

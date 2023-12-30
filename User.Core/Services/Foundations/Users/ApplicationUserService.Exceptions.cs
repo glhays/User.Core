@@ -33,6 +33,14 @@ namespace User.Core.Services.Foundations.Users
             {
                 throw CreateAndLogValidationException(nullApplicationUserException);
             }
+            catch (ApplicationUserPasswordValidationException applicationUserPasswordValidationException)
+            {
+                throw CreateAndLogValidationException(applicationUserPasswordValidationException);
+            }
+            catch(InvalidApplicationUserPasswordException invalidApplicationUserPasswordException)
+            {
+                throw CreateAndLogPasswordValidationException(invalidApplicationUserPasswordException);
+            }
         }
 
         private async ValueTask<ApplicationUser> TryCatch(
@@ -179,6 +187,17 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogServiceException(failedApplicationUsersServiceException);
             }
+        }
+
+        private ApplicationUserPasswordValidationException CreateAndLogPasswordValidationException(
+            Xeption exception)
+        {
+            var applicationUserPasswordValidationException =
+                new ApplicationUserPasswordValidationException(exception);
+
+            this.loggingBroker.LogError(applicationUserPasswordValidationException);
+
+            return applicationUserPasswordValidationException;
         }
 
         private ApplicationUserModifyPasswordValidationException CreateAndLogModifyPasswordValidationException(

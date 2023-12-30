@@ -5,11 +5,11 @@
 
 using System;
 using System.Threading.Tasks;
-using Moq;
-using User.Core.Models.Users.Exceptions;
-using User.Core.Models.Users;
-using Xunit;
 using FluentAssertions;
+using Moq;
+using User.Core.Models.Users;
+using User.Core.Models.Users.Exceptions;
+using Xunit;
 
 namespace User.Core.Tests.Unit.Services.Foundations.Users
 {
@@ -63,42 +63,46 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             this.dateTimeBrokerMock.VerifyNoOtherCalls();
         }
 
-        [Fact]
-        private async Task ShouldThrowValidationExceptionOnRetrievePasswordValidationIfNotValidAndLogItAsync()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        private async Task ShouldThrowValidationExceptionOnRetrievePasswordValidationIfNotValidAndLogItAsync(
+            string invalidPasswordText)
         {
             // given
-            ApplicationUser randomApplicationUser = CreateRandomApplicationUser();
-            string somePassword = GetRandomPassword();
+            var randomApplicationUser = CreateRandomApplicationUser();
+            var somePassword = invalidPasswordText;
 
-            var invalidApplicationUserException =
-                new InvalidApplicationUserException(
-                    message: "Invalid ApplicationUser, correct errors to continue.");
+            var invalidApplicationUserPasswordException =
+                new InvalidApplicationUserPasswordException(
+                    message: "Invalid user password error occurred, provide valid password.");
 
-            invalidApplicationUserException.AddData(
-                key: nameof(ApplicationUser),
-                values: "Value is required");
+            invalidApplicationUserPasswordException.AddData(
+                key: nameof(somePassword),
+                values: "Text is required");
 
-            var expectedApplicationUserValidationException =
-                new ApplicationUserValidationException(
-                    message: "ApplicationUser validation errors occurred, please try again.",
-                    innerException: invalidApplicationUserException);
+            var expectedApplicationUserPasswordValidationException =
+                new ApplicationUserPasswordValidationException(
+                    message: "Password validation failed error, please provide a valid password.",
+                    innerException: invalidApplicationUserPasswordException);
 
             // when
             ValueTask<bool> applicationUserPasswordValidationTask =
                 this.applicationUserService.RetrieveUserPasswordValidationAsync(
                     randomApplicationUser, somePassword);
 
-            ApplicationUserValidationException actualUserValidationException =
-              await Assert.ThrowsAsync<ApplicationUserValidationException>(
+            ApplicationUserPasswordValidationException actualUserPasswordValidationException =
+              await Assert.ThrowsAsync<ApplicationUserPasswordValidationException>(
                   applicationUserPasswordValidationTask.AsTask);
 
             // then
-            actualUserValidationException.Should().BeEquivalentTo(
-                expectedApplicationUserValidationException);
+            actualUserPasswordValidationException.Should().BeEquivalentTo(
+                expectedApplicationUserPasswordValidationException);
 
             this.loggingBrokerMock.Verify(broker =>
                 broker.LogError(It.Is(SameExceptionAs(
-                    expectedApplicationUserValidationException))),
+                    expectedApplicationUserPasswordValidationException))),
                         Times.Once);
 
             this.userManagementBrokerMock.Verify(broker =>

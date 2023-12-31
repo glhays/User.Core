@@ -41,6 +41,21 @@ namespace User.Core.Services.Foundations.Users
             {
                 throw CreateAndLogPasswordValidationException(invalidApplicationUserPasswordException);
             }
+            catch (SqlException sqlException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(sqlException);
+
+                throw CreateAndLogCriticalDependencyExcpetion(
+                    failedApplicationUserStorageException);
+            }
+            catch (Exception exception)
+            {
+                var failedApplicationUserServiceException =
+                    new FailedApplicationUserServiceException(exception);
+
+                throw CreateAndLogServiceException(failedApplicationUserServiceException);
+            }
         }
 
         private async ValueTask<ApplicationUser> TryCatch(

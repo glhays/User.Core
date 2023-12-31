@@ -22,7 +22,6 @@ namespace User.Core.Tests.Unit.Services.Foundations.Users
             ApplicationUser randomApplicationUser =
                 CreateRandomApplicationUser();
             string somePassword = GetRandomPassword();
-
             var serviceException = new Exception();
 
             var failedApplicationUserException =

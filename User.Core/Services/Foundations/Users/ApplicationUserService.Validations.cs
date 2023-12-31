@@ -4,8 +4,10 @@
 // -----------------------------------------------------------
 
 using System;
+using System.Data;
 using User.Core.Models.Users;
 using User.Core.Models.Users.Exceptions;
+using Xeptions;
 
 namespace User.Core.Services.Foundations.Users
 {
@@ -107,6 +109,17 @@ namespace User.Core.Services.Foundations.Users
             if (applicationUser is null)
             {
                 throw new NullApplicationUserException();
+            }
+        }
+
+        private static void ValidateOnPasswordValidation(string somePassword) =>
+            ValidateY((Rule: IsInvalid(somePassword), Parameter: nameof(somePassword)));
+
+        private static void ValidateApplicationUserPassword(bool passwordResult)
+        {
+            if(passwordResult is false)
+            {
+                throw new InvalidApplicationUserPasswordException();
             }
         }
 
@@ -212,6 +225,25 @@ namespace User.Core.Services.Foundations.Users
             }
 
             invalidModifyPasswordException.ThrowIfContainsErrors();
+        }
+
+        private static void ValidateY(params (dynamic Rule, string Parameter)[]
+            validations)
+        {
+            var invalidApplicationPasswordException =
+                new InvalidApplicationUserPasswordException();
+
+            foreach ((dynamic rule, string parameter) in validations)
+            {
+                if (rule.Condition)
+                {
+                    invalidApplicationPasswordException.UpsertDataList(
+                        key: parameter,
+                        value: rule.Message);
+                }
+            }
+
+            invalidApplicationPasswordException.ThrowIfContainsErrors();
         }
     }
 }

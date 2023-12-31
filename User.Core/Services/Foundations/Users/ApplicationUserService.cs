@@ -103,5 +103,20 @@ namespace User.Core.Services.Foundations.Users
             
             return await this.userManagementBroker.SelectUserPasswordResetTokenAsync(user);
         });
+
+        public ValueTask<bool> RetrieveUserPasswordValidationAsync(
+            ApplicationUser applicationUser, string password) =>
+        TryCatch(async () =>
+        {
+            ValidateApplicationUser(applicationUser);
+            ValidateOnPasswordValidation(password);
+
+            bool validationResult =
+                await this.userManagementBroker.SelectPasswordValidationAsync(applicationUser, password);
+            
+            ValidateApplicationUserPassword(validationResult);
+            
+            return validationResult;
+        });
     }
 }

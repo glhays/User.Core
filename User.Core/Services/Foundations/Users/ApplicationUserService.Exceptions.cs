@@ -20,6 +20,43 @@ namespace User.Core.Services.Foundations.Users
         private delegate ValueTask<ApplicationUser> ReturningApplicationUserFunction();
         private delegate ValueTask<string> ReturningApplicationUserStringFunction();
         private delegate IQueryable<ApplicationUser> ReturningApplicationUsersFunction();
+        private delegate ValueTask<bool> ReturningApplicationUserBooleanFunction();
+
+        private async ValueTask<bool> TryCatch(
+            ReturningApplicationUserBooleanFunction returningApplicationUserBooleanFunction)
+        {
+            try
+            {
+                return await returningApplicationUserBooleanFunction();
+            }
+            catch (NullApplicationUserException nullApplicationUserException)
+            {
+                throw CreateAndLogValidationException(nullApplicationUserException);
+            }
+            catch (ApplicationUserPasswordValidationException applicationUserPasswordValidationException)
+            {
+                throw CreateAndLogValidationException(applicationUserPasswordValidationException);
+            }
+            catch(InvalidApplicationUserPasswordException invalidApplicationUserPasswordException)
+            {
+                throw CreateAndLogPasswordValidationException(invalidApplicationUserPasswordException);
+            }
+            catch (SqlException sqlException)
+            {
+                var failedApplicationUserStorageException =
+                    new FailedApplicationUserStorageException(sqlException);
+
+                throw CreateAndLogCriticalDependencyExcpetion(
+                    failedApplicationUserStorageException);
+            }
+            catch (Exception exception)
+            {
+                var failedApplicationUserServiceException =
+                    new FailedApplicationUserServiceException(exception);
+
+                throw CreateAndLogServiceException(failedApplicationUserServiceException);
+            }
+        }
 
         private async ValueTask<ApplicationUser> TryCatch(
             ReturningApplicationUserFunction returningApplicationUserFunction)
@@ -165,6 +202,17 @@ namespace User.Core.Services.Foundations.Users
 
                 throw CreateAndLogServiceException(failedApplicationUsersServiceException);
             }
+        }
+
+        private ApplicationUserPasswordValidationException CreateAndLogPasswordValidationException(
+            Xeption exception)
+        {
+            var applicationUserPasswordValidationException =
+                new ApplicationUserPasswordValidationException(exception);
+
+            this.loggingBroker.LogError(applicationUserPasswordValidationException);
+
+            return applicationUserPasswordValidationException;
         }
 
         private ApplicationUserModifyPasswordValidationException CreateAndLogModifyPasswordValidationException(

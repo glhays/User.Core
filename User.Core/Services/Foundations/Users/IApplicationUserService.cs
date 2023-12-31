@@ -20,5 +20,6 @@ namespace User.Core.Services.Foundations.Users
 
         ValueTask<ApplicationUser> ModifyUserPasswordAsync(ApplicationUser user, string token, string password);
         ValueTask<string> RetrieveUserPasswordResetTokenAsync(ApplicationUser user);
+        ValueTask<bool> RetrieveUserPasswordValidationAsync(ApplicationUser applicationUser, string password);
     }
 }
